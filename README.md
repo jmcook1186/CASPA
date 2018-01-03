@@ -80,13 +80,13 @@ in the model are run once at the beginning and the spectral and broadband
 data appended to lists. These are then used as a lookup table for the
 cellular model. Of course, this has drastically reduced the run time.
 
-2) Bug fix in final loop - previously able to increase cell values above
+Bug fix in final loop - previously able to increase cell values above
 10. This was because when an individual cell reached carrying capacity
 the algae grew by spreading but was able to spread into cells whose
 values > 10. This is now fixed so no cell can exceed the carrying
 capacity.
 
-3) Condense loops - now single loop for if rand>50 OR cell value 
+Condense loops - now single loop for if rand>50 OR cell value 
  =10 (previously two sequential loops)
 
 
