@@ -37,7 +37,9 @@
 % have 2x algal biomass in upper layer, meaning 1 timestep is equal to the
 % doubling time of the algae, making the time dimension tractable. For a
 % doubling time of 3 days, one timestep = 3 days. Albedo change / doubling
-% time (days) = albedo change per day.
+% time (days) = albedo change per day. In the final plot, x_time is
+% calculated as timestep * doubling_time to enable plotting in units of
+% days.
 
 % Also, in the default version the algal growth is uninterupted, so left
 % long enough the algae will have even coverage at carrying capacity.
@@ -54,18 +56,16 @@
        
     % 1. Deal with edge effects (-1s and +1s can push the indexing out of grid
     % range, currently counter starts at 2 and ends at i,j -1, but this
-    % leads to a border that doesn't update)
+    % leads to a border that doesn't update) and simply isn't plotted.
     
-    % 2. plot(meangrid) after runs and analyse temporal evolution
-    
-    % 3. Could add an additional randi() dice roll to randomly reduce value
+    % 2. Could add an additional randi() dice roll to randomly reduce value
     % of cells, simulating rainfall washaway. Alternatively, a sudden dust
     % deposition event...? These don't have to be random, they could start
     % on a particular ticker value (e.g. at 20th timestep: rain).
         
-    % 4. Can the initial grid be set using UAV por satellite imagery?
+    % 3. Can the initial grid be set using UAV por satellite imagery?
     
-    % 5. How should I deal with dust? constant background? 
+    % 4. How should I deal with dust? constant background? 
 
     
 %%%  VERSION 4 EDITS:
@@ -93,13 +93,13 @@ IRF_sum = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %read incoming irradiance file and assign to variable 'incoming'
-fileID = fopen('H:/FromGardner/snicar_package/mlw_sfc_flx_frc_clr.txt');
+fileID = fopen('media/joe/9446-2970/FromGardner/snicar_package/mlw_sfc_flx_frc_clr.txt');
 incoming=textscan(fileID,'%f','Delimiter',',');
 incoming=cell2mat(incoming); %convert to column vector
 fclose(fileID);
 
 % set up time ticker (time_tot = total no of timesteps in run)
-time_tot = 50;
+time_tot = 25;
 timestep = 1;
 
 % %% Set up grid
@@ -109,8 +109,10 @@ gridy= 100; % length of y-axis
 alg_frac = 0.5; % percentage of algal coverage at start of experiment (all initialise as light algae: class 1)
 non_alg_frac = gridsize-alg_frac; % residual = non-algal, assumed clean
 doubling_time = 3; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
+chance_insitu = 60; % probability (%) that growth occurs in situ (100 - chance_insitu = chance spreading)
 
 % turn % coverage into actual number of pixels
+
 alg_pixels = gridsize*(alg_frac/100); 
 non_alg_pixels = gridsize-alg_pixels;
 
@@ -127,14 +129,14 @@ for counter = 1:timestep:time_tot
     for i = 2:1:gridx-1  %%%% NEED TO DEAL WITH EDGES BETTER!!!!
         for j = 2:1:gridy-1 %%%% NEED TO DEAL WITH EDGES BETTER!!!!            
       
-            if grid(i,j) == 0   % if cell = 0, stay clean
+            if grid(i,j) == 0   % if cell = 0, stay clean: i.e. bloom can't spontaneously form in areas of clean snow
                 grid(i,j) = grid(i,j);
                        
-            elseif grid(i,j) > 0 && grid(i,j) < 10 % if cell is between 1 and 9, 50% chance of increasing in situ
-                if rand < 60
+            elseif grid(i,j) > 0 && grid(i,j) < 10 % if cell is between 1 and 9, chance of increasing in situ = 'chance_insitu'
+                if rand < chance_insitu
                     grid(i,j) = grid(i,j)+1;
                     
-                elseif rand > 60 || grid(i,j) == 10 % if rand > 50 OR cell value = 10, bloom spreads, not darkening in situ
+                elseif rand > 100-chance_insitu || grid(i,j) == 10 % if rand > 100-chance_insitu OR cell value = 10, bloom spreads, not darkening in situ
                     rand1 = randi(8,1); % each neighbour has equal chance of being colonised
             
                     if i < gridx && j < gridy && i >1 && j >1
@@ -329,11 +331,14 @@ grid2 = grid; % copy surface class grid for populating with albedos
     
 
 end
-
+    
+    x_time = [1:1:time_tot].*doubling_time; % set up real time in days for plotting
+    
     figure(2)
     hold on
-    plot(IRF_BBA,'color','r')
-    plot(BBAlist,'color','b')
+    plot(x_time,IRF_BBA,'color','r')
+    plot(x_time,BBAlist,'color','b')
+    xlabel('Time (days)')
     legend('IRF (W/grid)','Broadband Albedo')
     
     %%% IRF calculations integrated over wavelength and time
