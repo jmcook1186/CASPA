@@ -229,6 +229,9 @@ initial_TG = initial_T(1) - initial_T(end) / sum(dz); % initial temp gradient (0
 fliqs = [0.1, 0.2, 0.3, 0.4, 0.5]; % initial water fraction per layer
 fliqs = fliqs(:);
 
+f_refs = [0, 0, 0.1, 0.1, 0.1];
+f_refs = f_refs(:);
+
 doubling_time = 3; % must be the same as in CASPA (default = 3)
 r0 = 100; % reff of fresh snow
 
@@ -254,7 +257,8 @@ for i = 1:1:nbr_lyr   % iterate through each vertical layer
     TG = temp_grad;
     doubling_time = doubling_time; % required to convert timestep into days
     fliq = fliqs(i); % assign liquid water fraction
-    r_new = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq) % function call from grain_size_evolution.m
+    f_ref = f_refs(i);
+    r_new = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq,f_ref) % function call from grain_size_evolution.m
     new_r(i) = r_new; % append new radius into array
 end
 
