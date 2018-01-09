@@ -104,14 +104,14 @@ also some minor changes to variable names etc. to imporve the readability.
 1. Deal with edge effects (-1s and +1s can push the indexing out of grid
 range, currently counter starts at 2 and ends at i,j -1, but this
 leads to a border that doesn't update)
-    
-2. plot(meangrid) after runs and analyse temporal evolution
-     
-3. Could add an additional randi() dice roll to randomly reduce value
+       
+2. Could add an additional randi() dice roll to randomly reduce value
 of cells, simulating rainfall washaway. Alternatively, a sudden dust
 deposition event...? These don't have to be random, they could start
 on a particular ticker value (e.g. at 20th timestep: rain).
         
-4. Can the initial grid be set using UAV por satellite imagery?
+3. Can the initial grid be set using UAV por satellite imagery?
     
-5. How should I deal with dust? constant background value? 
+4. How should I deal with dust? constant background value? 
+
+5. Incorporation of snow grain evolution parameterisation from Flanner and Zender?
