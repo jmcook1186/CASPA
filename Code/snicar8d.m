@@ -65,7 +65,9 @@
 % loaded below under "Set incident solar flux spectral distribution:"
 %
 %
+
 %%%%%  Output data: %%%%%
+
 % All output data is contained in the matrix "data_out"
 % data_out(:,1) = wavelength (microns, m^-6)
 % data_out(:,2) = spectrally-dependent albedo;
@@ -88,9 +90,9 @@ function data_out = snicar8d(BND_TYP_IN, DIRECT_IN, APRX_TYP_IN, ...
                              mss_cnc_sot1_in, mss_cnc_sot2_in, ...
                              mss_cnc_dst1_in, mss_cnc_dst2_in, ...
                              mss_cnc_dst3_in, mss_cnc_dst4_in, ...
-                             mss_cnc_ash1_in,mss_cnc_bio1_in, mss_cnc_bio2_in,mss_cnc_bio3_in,mss_cnc_bio4_in,mss_cnc_bio5_in, mss_cnc_bio6_in, mss_cnc_bio7_in, mss_cnc_hematite_in, fl_sot1_in, fl_sot2_in, ...
+                             mss_cnc_ash1_in,mss_cnc_bio1_in, mss_cnc_bio2_in,mss_cnc_bio3_in,mss_cnc_bio4_in,mss_cnc_bio5_in, mss_cnc_bio6_in, mss_cnc_bio7_in, mss_cnc_hematite_in, mss_cnc_mixed_sand_in, fl_sot1_in, fl_sot2_in, ...
                              fl_dst1_in, fl_dst2_in, fl_dst3_in, ...
-                             fl_dst4_in, fl_ash1_in,fl_bio1_in,fl_bio2_in,fl_bio3_in,fl_bio4_in, fl_bio5_in,fl_bio6_in, fl_bio7_in, fl_hematite_in);
+                             fl_dst4_in, fl_ash1_in,fl_bio1_in,fl_bio2_in,fl_bio3_in,fl_bio4_in, fl_bio5_in,fl_bio6_in, fl_bio7_in, fl_hematite_in, fl_mixed_sand_in);
 
     
 if (1==0)
@@ -123,7 +125,7 @@ if (1==0)
     
     % NUMBER OF PARTICLE SPECIES IN SNOW (ICE EXCLUDED)
     
-    nbr_aer = 15; % JC EDIT
+    nbr_aer = 16; % JC EDIT
   
     
     % PARTICLE MASS MIXING RATIOS (units: ng g-1)
@@ -142,7 +144,7 @@ if (1==0)
     mss_cnc_bio6(1:nbr_lyr)  = 0.0;    % biological impurity 6 % JC EDIT
     mss_cnc_bio7(1:nbr_lyr)  = 0.0;    % biological impurity 7 % JC EDIT
     mss_cnc_hematite(1:nbr_lyr)= 0.0;    % hematite type 1 % JC EDIT
-  
+    mss_cnc_mixed_sand(1:nbr_lyr) = 0.0; % mixed sand % JC EDIT
     
     % FILE NAMES CONTAINING MIE PARAMETERS FOR ALL AEROSOL SPECIES:
     % (ideally, these files should exist in all 'band' directories)
@@ -161,7 +163,7 @@ if (1==0)
     fl_bio6  = 'biological_6.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2) % JC EDIT
     fl_bio7  = 'biological_7.nc'; % Biological impurity 6 (20um diameter, pigs as per bio2) % JC EDIT
     fl_hematite = 'Hematite.nc'; % hematite type 1 % JC EDIT
-    
+    fl_mixed_sand = 'mixed_sand.nc'; % mixed sand % JC EDIT
     
     % COSINE OF SOLAR ZENITH ANGLE FOR DIRECT-BEAM RT
     
@@ -218,7 +220,7 @@ else
     mss_cnc_bio6  = mss_cnc_bio6_in;   % JC EDIT
     mss_cnc_bio7  = mss_cnc_bio7_in;   % JC EDIT
     mss_cnc_hematite = mss_cnc_hematite_in;   % JC EDIT
-    
+    mss_cnc_mixed_sand = mss_cnc_mixed_sand_in; % JC EDIT
     
     fl_sot1       = fl_sot1_in;
     fl_sot2       = fl_sot2_in;
@@ -235,6 +237,7 @@ else
     fl_bio6       = fl_bio6_in;   % JC EDIT
     fl_bio7       = fl_bio7_in;   % JC EDIT
     fl_hematite     = fl_hematite_in;   % JC EDIT
+    fl_mixed_sand = fl_mixed_sand_in; % JC EDIT
 
     
 end;
@@ -383,29 +386,38 @@ for n=1:nbr_lyr
        
     %NEW code for reading in rds_coated() when rds_snw() is set to zero
        %(i.e. using ice spheres coated with a water film)
+       
     if (rds_snw(n) == 0)    % JC EDIT
-        s3 = int2str(rds_coated(n));   % JC EDIT
+        
+        %s3 = int2str(rds_coated(n));   % JC EDIT
+        s3 = rds_coated(n);
+        
         fl_in = strcat(wrkdir,fl_stb1,fl_stb3,s3,fl_stb2)   % JC EDIT
     %   *************************************************        
     elseif (rds_snw(n)<10)   % JC EDIT
         s1    = int2str(0);   % JC EDIT
         s2    = int2str(rds_snw(n));   % JC EDIT
         fl_in = strcat(wrkdir,fl_stb1,s1,s1,s1,s2,fl_stb2);   % JC EDIT
+    
     elseif (rds_snw(n)<100)   % JC EDIT
         s1    = int2str(0);   % JC EDIT
         s2    = int2str(rds_snw(n));   % JC EDIT
         fl_in = strcat(wrkdir,fl_stb1,s1,s1,s2,fl_stb2);   % JC EDIT
+    
     elseif ((rds_snw(n)>=100) & (rds_snw(n)<1000))   % JC EDIT
         s1    = int2str(0);   % JC EDIT
         s2    = int2str(rds_snw(n));   % JC EDIT
         fl_in = strcat(wrkdir,fl_stb1,s1,s2,fl_stb2);   % JC EDIT
+    
     elseif ((rds_snw(n)>=1000) & (rds_snw(n)<9999))   % JC EDIT
         s1    = int2str(0);   % JC EDIT
         s2    = int2str(rds_snw(n));   % JC EDIT
         fl_in = strcat(wrkdir,fl_stb1,s2,fl_stb2);   % JC EDIT
+    
     elseif (rds_snw(n)>9999)   % JC EDIT
         s2 = int2str(rds_snw(n));   % JC EDIT
         fl_in = strcat(wrkdir,fl_stb1,s2,fl_stb2);   % JC EDIT   
+    
     elseif (rds_snw(n)==99999)   % JC EDIT
         fl_in = fl_in_usr;   % JC EDIT
     
@@ -436,6 +448,7 @@ fl_in12 = strcat(wrkdir,fl_bio5); % JC EDIT
 fl_in13 = strcat(wrkdir,fl_bio6); % JC EDIT
 fl_in14 = strcat(wrkdir,fl_bio7); % JC EDIT
 fl_in15 = strcat(wrkdir,fl_hematite); % JC EDIT
+fl_in16 = strcat(wrkdir,fl_mixed_sand); % JEC EDIT
 
 
 omega_aer(:,1)       = ncread(fl_in1,'ss_alb');
@@ -499,6 +512,10 @@ omega_aer(:,15)       = ncread(fl_in15,'ss_alb');   % JC EDIT
 g_aer(:,15)           = ncread(fl_in15,'asm_prm');   % JC EDIT
 ext_cff_mss_aer(:,15) = ncread(fl_in15,'ext_cff_mss');   % JC EDIT
 
+omega_aer(:,16)       = ncread(fl_in16,'ss_alb');   % JC EDIT
+g_aer(:,16)           = ncread(fl_in16,'asm_prm');   % JC EDIT
+ext_cff_mss_aer(:,16) = ncread(fl_in16,'ext_cff_mss');   % JC EDIT
+
 % Set aerosol concentration matrix:
 mss_cnc_aer(1:nbr_lyr,1) = mss_cnc_sot1;
 mss_cnc_aer(1:nbr_lyr,2) = mss_cnc_sot2;
@@ -515,6 +532,7 @@ mss_cnc_aer(1:nbr_lyr,12) = mss_cnc_bio5; % JC EDIT
 mss_cnc_aer(1:nbr_lyr,13) = mss_cnc_bio6; % JC EDIT
 mss_cnc_aer(1:nbr_lyr,14) = mss_cnc_bio7; % JC EDIT
 mss_cnc_aer(1:nbr_lyr,15) = mss_cnc_hematite; %JC EDIT
+mss_cnc_aer(1:nbr_lyr,16) = mss_cnc_mixed_sand; % JC EDIT
 
 % convert to units of kg/kg:
 mss_cnc_aer = mss_cnc_aer.*10^-9;
@@ -850,7 +868,7 @@ F_abs_nir_btm = sum(F_btm_net(vis_max_idx+1:nir_max_idx));
 
 % Radiative heating rate:
 heat_rt = F_abs_slr./(L_snw.*2117);   % [K/s] 2117 = specific heat ice (J kg-1 K-1)	   
-heat_rt = heat_rt.*3600;              %[K/hr]
+heat_rt = heat_rt.*3600;              % [K/hr]
 				      
 				      
 % Energy conservation check:

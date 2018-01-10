@@ -16,6 +16,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%  Input parameters: %%%%%%%%%%%
+
 % BND_TYP:      Spectral grid (=1 for 470 bands. This is the
 %               only functional option in this distribution)
 % DIRECT:       Direct or diffuse incident radiation (1=direct, 0=diffuse)
@@ -55,6 +56,7 @@
 %                  (units of parts per billion, ng g-1)
 % mss_cnc_water1: mass mixing ratio of water type 1
 %                  (units of parts per billion, ng g-1)
+
 % fl_sot1:      name of file containing optical properties for BC species 1
 % fl_sot2:      name of file containing optical properties for BC species 2
 % fl_dst1:      name of file containing optical properties for dust species 1
@@ -83,26 +85,28 @@ coszen   = 0.50;
 %   Value is applied to all wavelengths.
 %   User can also specify spectrally-dependent ground albedo
 %   internally in snicar8d.m
+
 R_sfc    = 0.15;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
 dz       = [0.05 0.05 0.05 0.05 0.8];
- 
+
 nbr_lyr  = length(dz);  % number of snow layers
 
 % SNOW DENSITY OF EACH LAYER (units: kg/m3)
+
 rho_snw(1:nbr_lyr) = [400,400,400,500,500];  
 
 
 % SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
 
-rds_snw(1:nbr_lyr) = [200,200,300,300,300];
+rds_snw(1:nbr_lyr) = [1000,200,300,300,300];
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()
-rds_coated(1:nbr_lyr) = [0,0,0,0,0];
 
+rds_coated(1:nbr_lyr) = ["0","0","0","0","0"];
 
 % NUMBER OF AEROSOL SPECIES IN SNOW (ICE EXCLUDED)
 %  Species numbers (used in snicar8d.m) are:
@@ -144,8 +148,8 @@ mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
 mss_cnc_bio6(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
 mss_cnc_bio7(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 7
-mss_cnc_hematite(1:nbr_lyr) = [0,0,0,0,0];   % Water, 2 mm spheres
-mss_cnc_mixed_sand(1:nbr_lyr) = [0,0,0,0,0];
+mss_cnc_hematite(1:nbr_lyr) = [0,0,0,0,0];   % hematite
+mss_cnc_mixed_sand(1:nbr_lyr) = [0,0,0,0,0]; % mixed quartz/clay sand
 
 
 % FILE NAMES CONTAINING MIE PARAMETERS FOR ALL AEROSOL SPECIES:
@@ -205,8 +209,10 @@ hold on;
 
 
 %Report albedo
+
 alb_slr % albedo over solar spectrum
 flx_abs_snw % absorbed energy in the snowpack
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%% SNOW GRAIN EVOLUTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -220,7 +226,10 @@ flx_abs_snw % absorbed energy in the snowpack
 % (2006) and used in the CLM model
 % (http://www.cesm.ucar.edu/models/cesm1.0/clm/CLM4_Tech_Note.pdf).
 
-% USER DEFINED VARIABLES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% USER DEFINED VARIABLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 initial_T = [273.15, 273.15, 273.15, 273.15, 273.15]; % melting snow pack - isothermal?
 initial_T = initial_T(:); % convert to 1 column vector
 
@@ -229,11 +238,12 @@ initial_TG = initial_T(1) - initial_T(end) / sum(dz); % initial temp gradient (0
 fliqs = [0.1, 0.2, 0.3, 0.4, 0.5]; % initial water fraction per layer
 fliqs = fliqs(:);
 
-f_refs = [0, 0, 0.1, 0.1, 0.1];
+f_refs = [0, 0, 0.1, 0.1, 0.1]; % initial refrozen ice fraction per layer
 f_refs = f_refs(:);
 
 doubling_time = 3; % must be the same as in CASPA (default = 3)
 r0 = 100; % reff of fresh snow
+
 
 % VARIABLES FROM SNICAR
 heat_rt; % radiative heating rate in K/hr
@@ -244,8 +254,7 @@ heat_timestep = heat_day * 3; % heating over timestep (1 timestep = 3 days)
 T = initial_T + heat_timestep;
 snow_depth = sum(dz); % depth of snowpack incorporating all layers
 temp_grad = ((T(1) - T(end)))/snow_depth; % temperature gradient through snowpack
-
-    
+ 
 new_r = zeros(nbr_lyr,1); % set up empty array for new grain radius
 
 for i = 1:1:nbr_lyr   % iterate through each vertical layer
@@ -258,8 +267,17 @@ for i = 1:1:nbr_lyr   % iterate through each vertical layer
     doubling_time = doubling_time; % required to convert timestep into days
     fliq = fliqs(i); % assign liquid water fraction
     f_ref = f_refs(i);
-    r_new = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq,f_ref) % function call from grain_size_evolution.m
+    r_new = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq,f_ref); % function call from grain_size_evolution.m
     new_r(i) = r_new; % append new radius into array
+   
+    if f_ref + fliq >= 1
+        check = "LIQUID & REFROZEN FRACTIONS EXCEED 1: CHANGE!!!" % Alert user if liquid/refrozen fractions too high
+    end
+    
+    if temp > 273.15
+        ADD_WATER = "LAYER " + num2str(i) + " melting: add liquid water film"
+    end
+    
 end
 
 new_r

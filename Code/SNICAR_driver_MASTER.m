@@ -1,6 +1,7 @@
 % Driver routine for SNICAR.  Also see commenting in snicar8d.m
 
 %%%%%%%%%%  Input parameters: %%%%%%%%%%%
+
 % BND_TYP:      Spectral grid (=1 for 470 bands. This is the
 %               only functional option in this distribution)
 % DIRECT:       Direct or diffuse incident radiation (1=direct, 0=diffuse)
@@ -22,6 +23,7 @@
 % rho_snw:      array of snow layer densities [kg m-3]. Must have same length as dz
 % rds_snw:      array of snow layer effective grain radii [microns]. Must have same length as dz
 % nbr_aer:      number of aerosol species in snowpack
+
 % mss_cnc_sot1: mass mixing ratio of black carbon species 1 (uncoated BC)
 %                 (units of parts per billion, ng g-1)
 % mss_cnc_sot2: mass mixing ratio of black carbon species 2 (sulfate-coated BC)
@@ -40,6 +42,7 @@
 %                  (units of parts per billion, ng g-1)
 % mss_cnc_water1: mass mixing ratio of water type 1
 %                  (units of parts per billion, ng g-1)
+
 % fl_sot1:      name of file containing optical properties for BC species 1
 % fl_sot2:      name of file containing optical properties for BC species 2
 % fl_dst1:      name of file containing optical properties for dust species 1
@@ -49,6 +52,7 @@
 % fl_ash1:      name of file containing optical properties for ash species 1
 % fl_bio1:      name of file containing optical properties for bio species 1
 % fl_water1:    name of file containing optical properties for water type 1
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 clear;
@@ -70,7 +74,7 @@ R_sfc    = 0.15;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
-dz       = [0.05 0.02 0.02 0.02 0.02];
+dz       = [0.05 0.05 0.05 0.05 0.8];
  
 nbr_lyr  = length(dz);  % number of snow layers
 
@@ -80,14 +84,16 @@ rho_snw(1:nbr_lyr) = [400,400,400,500,500];
 
 % SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
 
-rds_snw(1:nbr_lyr) = [5000,5000,5000,5000,5000];
+rds_snw(1:nbr_lyr) = [1000,2000,3000,3000,3000];
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()
-rds_coated(1:nbr_lyr) = [0,0,0,0,0];
+% rds_coated should be input as strings.
+rds_coated(1:nbr_lyr) = ["0","0","0","0","0"];
 
 
 % NUMBER OF AEROSOL SPECIES IN SNOW (ICE EXCLUDED)
+
 %  Species numbers (used in snicar8d.m) are:
 %    1: uncoated black carbon
 %    2: coated black carbon
@@ -102,12 +108,14 @@ rds_coated(1:nbr_lyr) = [0,0,0,0,0];
 %    11: biological impurity 4
 %    12: biological impurity 5
 %    13: biological impurity 6
-%    14: hematite
+%    14: biological impurity 7
+%    15: hematite
+%    16: mixed sand (quartz and clay)
 
-nbr_aer = 15;
+nbr_aer = 16;
 
 
-for x = [1]   % for reference: 1e3 = 1ug/g (1000 ppb or 1 ppm)
+for x = [2e6]   % for reference: 1e3 = 1ug/g (1000 ppb or 1 ppm)
                   % 1 e6 = 1000ug = 1mg
 
 % PARTICLE MASS MIXING RATIOS (units: ng(species)/g(ice), or ppb)
@@ -125,7 +133,8 @@ mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
 mss_cnc_bio6(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
 mss_cnc_bio7(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 7
-mss_cnc_hematite(1:nbr_lyr) = [35589,0,0,0,0];   % Water, 2 mm spheres
+mss_cnc_hematite(1:nbr_lyr) = [33590,0,0,0,0];   % Water, 2 mm spheres
+mss_cnc_mixed_sand(1:nbr_lyr) = [508422,0,0,0,0];
 
 
 % FILE NAMES CONTAINING MIE PARAMETERS FOR ALL AEROSOL SPECIES:
@@ -144,14 +153,14 @@ fl_bio5  = 'biological_5.nc'; % Biological impurity 5 (10um diameter, pigs as pe
 fl_bio6  = 'biological_6.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2)
 fl_bio7  = 'biological_7.nc'; % Biological impurity 7 (20um diameter, pigs as per bio2)
 fl_hematite  = 'Hematite.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2)
-
+fl_mixed_sand  = 'mixed_sand.nc'; % Mixed sand (quartz and clays)
 
 % call SNICAR with these inputs:
 data_in = snicar8d(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, ...
     dz, rho_snw, rds_snw, rds_coated, nbr_aer, mss_cnc_sot1, ...
     mss_cnc_sot2, mss_cnc_dst1, mss_cnc_dst2, ...
-    mss_cnc_dst3, mss_cnc_dst4, mss_cnc_ash1, mss_cnc_bio1, mss_cnc_bio2,mss_cnc_bio3,mss_cnc_bio4,mss_cnc_bio5, mss_cnc_bio6, mss_cnc_bio7, mss_cnc_hematite, fl_sot1, ...
-    fl_sot2, fl_dst1, fl_dst2, fl_dst3, fl_dst4, fl_ash1, fl_bio1,fl_bio2,fl_bio3,fl_bio4,fl_bio5,fl_bio6, fl_bio7, fl_hematite);
+    mss_cnc_dst3, mss_cnc_dst4, mss_cnc_ash1, mss_cnc_bio1, mss_cnc_bio2,mss_cnc_bio3,mss_cnc_bio4,mss_cnc_bio5, mss_cnc_bio6, mss_cnc_bio7, mss_cnc_hematite, mss_cnc_mixed_sand, fl_sot1, ...
+    fl_sot2, fl_dst1, fl_dst2, fl_dst3, fl_dst4, fl_ash1, fl_bio1,fl_bio2,fl_bio3,fl_bio4,fl_bio5,fl_bio6, fl_bio7, fl_hematite, fl_mixed_sand);
 
 
 % process input data:
@@ -166,7 +175,7 @@ flx_abs_snw = data_in(4,3);   % total radiative absorption by all snow layers (n
 flx_abs(1)     = data_in(6,4); % top layer solar absorption
 flx_vis_abs(1) = data_in(7,4); % top layer VIS absorption
 flx_nir_abs(1) = data_in(8,4); % top layer NIR absorption
-heat_rt = data_in([1:5],6);
+heat_rt = data_in([1:5],6); % heating rate per layer K/hr
 %albedo = smooth(albedo,0.005); % add a simple smoothing function with short period
 
 
@@ -190,7 +199,11 @@ bgslope = ((albedo(26)-albedo(18))/0.075);
 %Report albedo
 alb_slr % albedo over solar spectrum
 flx_abs_snw % absorbed energy in the snowpack
-heat_rt % radiative heating rate in K/hr
+heat_rt; % radiative heating rate in K/hr
+
+
+snow_depth = sum(dz); % depth of snowpack incorporating all layers
+temp_grad = ((heat_rt(1) - heat_rt(end)))/snow_depth % temperature gradient through snowpack
+
 
 end
-    
