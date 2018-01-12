@@ -66,9 +66,14 @@
     % 3. Can the initial grid be set using UAV por satellite imagery?
     
     % 4. How should I deal with dust? constant background? 
+    
+    % 5. Need to reduce IRF etc due to day/night irradiance changes?
+    % Currently assumes constant irradiance throughout timestep (no night
+    % time)
 
     
 %%%  VERSION 4 EDITS:
+
 % 1) Updated colormap to show clean snow as white, then grades of red
 
 % 2) Radiative forcing calculations: ***** add details here *****
@@ -99,7 +104,7 @@ incoming=cell2mat(incoming); %convert to column vector
 fclose(fileID);
 
 % set up time ticker (time_tot = total no of timesteps in run)
-time_tot = 25;
+time_tot = 15;
 timestep = 1;
 
 % %% Set up grid
@@ -208,6 +213,8 @@ for counter = 1:timestep:time_tot
 %     drawnow
 %     pause(0.2)
 
+
+
 %%%%%%% CUT MODEL HERE IF SURFACE CLASS GRID ONLY REQUIRED %%%%%%%%%%%%%%%
                      %%%%%%%%%%%%%%%%%%%%%%
                      
@@ -292,8 +299,8 @@ grid2 = grid; % copy surface class grid for populating with albedos
     IRF_spectral = alb_inv.*incoming;  %% RF per day for whole area with mixed coverage, incoming = Wm-2, albedo = proportion, space = dimensionless, time = dimensionless (unless assigned)
     IRF_clean = alb_inv_clean.*incoming; % RF per day for whole area but just clean snow
     
-    IRF_BBA(counter) = sum(IRF_spectral); % broadband IRF per day (i.e. if algal growth rate = 3d, each timestep = 3d)
-    IRF_BBA_clean(counter) = sum(IRF_clean); % braodband IRF per day for clean snow (entire area)
+    IRF_BBA(counter) = sum(IRF_spectral); % broadband IRF at each timestep
+    IRF_BBA_clean(counter) = sum(IRF_clean); % broadband IRF at each timestep for clean snow (entire area)
 
 % Plot
     % Set colormap to white-red
@@ -324,7 +331,7 @@ grid2 = grid; % copy surface class grid for populating with albedos
     shading interp;
     cbar = colorbar;
     cbar.Limits=[0,0.7];
-    cbar.Label.String = 'Albedo'
+    cbar.Label.String = 'Albedo';
     caxis([0,0.7]);
     drawnow
     %saveas(figure,sprintf('FIG%d.png'));
@@ -332,17 +339,13 @@ grid2 = grid; % copy surface class grid for populating with albedos
 
 end
     
-    x_time = [1:1:time_tot].*doubling_time; % set up real time in days for plotting
-    
-    figure(2)
-    hold on
-    plot(x_time,IRF_BBA,'color','r')
-    plot(x_time,BBAlist,'color','b')
-    xlabel('Time (days)')
-    legend('IRF (W/grid)','Broadband Albedo')
-    
     %%% IRF calculations integrated over wavelength and time
-   
+    
+    % NOTE that the IRF here is measured per second by default. This is
+    % because the radiative transfer equations are calculations of flux,
+    % where flux is energy per unit time measured in Watts, where 1 watt =
+    % 1 joule/second. 
+    
     RF_BBA = sum(IRF_BBA.*24*60*60); % total RF over area over entire time of model run
     RF_BBA_clean = sum(IRF_BBA_clean.*24*60*60); % total RF over area over entire time of model run
     RF_BBA_impurities = RF_BBA - RF_BBA_clean; % total RF due to impurities over entire area over entire area and time of model run
@@ -358,3 +361,20 @@ end
     RF_daily_per_m = RF_daily / gridsize; % assuming 1 cell is 1 x 1 m 
     RF_daily_clean_per_m = RF_daily_clean / gridsize; % assuming 1 cell is 1 x 1m
     RF_daily_impurities_per_m = RF_daily_impurities / gridsize; % assuming 1 cell is 1 x 1 m
+    
+    
+    % Plot Fig 2 (RF and Albedo against time)
+    
+    x_time = [1:1:time_tot].*doubling_time; % set up real time in days for plotting
+    
+    figure(2)
+    hold on
+    yyaxis right
+    plot(x_time,IRF_BBA,'color','r')
+    ylabel('IRF (W/grid)')
+    yyaxis left
+    plot(x_time,BBAlist,'color','b')
+    ylabel('Albedo')
+    xlabel('Time (days)')
+    legend('IRF (W/grid)','Broadband Albedo')
+    

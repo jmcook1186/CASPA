@@ -52,7 +52,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [alb_slr,albedo_alg] = SNICAR_CA()
+function [alb_slr,albedo_clean] = SNICAR_CA()
 
 % RADIATIVE TRANSFER CONFIGURATION:
 BND_TYP  = 1;        % 1= 470 spectral bands
@@ -71,12 +71,12 @@ R_sfc    = 0.25;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
-dz       = [0.003 0.1 0.01 0.1 10];
+dz       = [0.01 0.1 0.01 0.1 10];
  
 nbr_lyr  = length(dz);  % number of snow layers
 
 % SNOW DENSITY OF EACH LAYER (units: kg/m3)
-rho_snw(1:nbr_lyr) = [500,500,500,500,500];  
+rho_snw(1:nbr_lyr) = [914,914,914,914,914];  
 
 
 % SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
@@ -101,12 +101,12 @@ rds_coated(1:nbr_lyr) = [0,0,0,0,0];
 %    11: biological impurity 4
 %    12: biological impurity 5
 %    13: biological impurity 6
-%    14: biological impurity 6
+%    14: biological impurity 7
 %    15: water
 
 nbr_aer = 15;
 
-    for x = 25.6e4   % for reference: 1e6 = 1ug/g (1000000 ppb or 1000 ppm)
+    for x = 0.64e6   % for reference: 1e6 = 1ug/g (1000000 ppb or 1000 ppm)
 
     % PARTICLE MASS MIXING RATIOS (units: ng(species)/g(ice), or ppb)
     mss_cnc_sot1(1:nbr_lyr)  = [0,0,0,0,0];  % uncoated black carbon
@@ -117,15 +117,15 @@ nbr_aer = 15;
     mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
     mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
     mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
-    mss_cnc_bio2(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 2
+    mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2
     mss_cnc_bio3(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 3
-    mss_cnc_bio4(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 4
-    mss_cnc_bio5(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 5
+    mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
+    mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
     mss_cnc_bio6(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
-    mss_cnc_bio7(1:nbr_lyr)  = [0,0,0,0,0];
+    mss_cnc_bio7(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
     mss_cnc_water1(1:nbr_lyr) = [0,0,0,0,0];   % Water, 2 mm spheres
-    
-    
+    mss_cnc_hematite(1:nbr_lyr) = [0,0,0,0,0];   % Water, 2 mm spheres
+    mss_cnc_mixed_sand(1:nbr_lyr) = [0,0,0,0,0];
     
     % FILE NAMES CONTAINING MIE PARAMETERS FOR ALL AEROSOL SPECIES:
     fl_sot1  = 'mie_sot_ChC90_dns_1317.nc';
@@ -141,16 +141,17 @@ nbr_aer = 15;
     fl_bio4  = 'biological_4.nc'; % Biological impurity 4 (30um diameter, 1.5%chll a only)
     fl_bio5  = 'biological_5.nc'; % Biological impurity 5 (10um diameter, pigs as per bio2)
     fl_bio6  = 'biological_6.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2)
-    fl_bio7  = 'biological_7.nc'; % Biological impurity 7 (50um diameter, pigs as per bio2)
-    fl_water1  = 'water_segelstein_20.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2)
+    fl_bio7 = 'biological_7.nc';
+    fl_hematite  = 'Hematite.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2)
+    fl_mixed_sand  = 'mixed_sand.nc'; % Mixed sand (quartz and clays)
     
     
     % call SNICAR with these inputs:
     data_in = snicar8d(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, ...
         dz, rho_snw, rds_snw, rds_coated, nbr_aer, mss_cnc_sot1, ...
         mss_cnc_sot2, mss_cnc_dst1, mss_cnc_dst2, ...
-        mss_cnc_dst3, mss_cnc_dst4, mss_cnc_ash1, mss_cnc_bio1, mss_cnc_bio2,mss_cnc_bio3,mss_cnc_bio4,mss_cnc_bio5, mss_cnc_bio6,mss_cnc_bio7, mss_cnc_water1, fl_sot1, ...
-        fl_sot2, fl_dst1, fl_dst2, fl_dst3, fl_dst4, fl_ash1, fl_bio1,fl_bio2,fl_bio3,fl_bio4,fl_bio5,fl_bio6,fl_bio7,fl_water1);
+        mss_cnc_dst3, mss_cnc_dst4, mss_cnc_ash1, mss_cnc_bio1, mss_cnc_bio2,mss_cnc_bio3,mss_cnc_bio4,mss_cnc_bio5, mss_cnc_bio6,mss_cnc_bio7, mss_cnc_hematite, mss_cnc_mixed_sand, fl_sot1, ...
+        fl_sot2, fl_dst1, fl_dst2, fl_dst3, fl_dst4, fl_ash1, fl_bio1,fl_bio2,fl_bio3,fl_bio4,fl_bio5,fl_bio6,fl_bio7, fl_hematite, fl_mixed_sand);
     
     
     % process input data:
@@ -166,7 +167,7 @@ nbr_aer = 15;
     flx_vis_abs(1) = data_in(7,4); % top layer VIS absorption
     flx_nir_abs(1) = data_in(8,4); % top layer NIR absorption
     
-    %albedo = smooth(albedo,0.02); % add a simple smoothing function with short period
+   % albedo = smooth(albedo,0.02); % add a simple smoothing function with short period
     
     % make a plot of spectrally-resolved albedo:
 %     plot(wvl,albedo,'linewidth',3);
@@ -187,7 +188,8 @@ nbr_aer = 15;
     
     %Report albedo
     alb_slr;
-    albedo_alg = albedo
+    albedo_clean = albedo;
+    
     
    
-end
+    end
