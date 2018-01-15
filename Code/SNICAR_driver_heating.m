@@ -96,12 +96,11 @@ nbr_lyr  = length(dz);  % number of snow layers
 
 % SNOW DENSITY OF EACH LAYER (units: kg/m3)
 
-rho_snw(1:nbr_lyr) = [400,400,400,500,500];  
-
+rho_snw(1:nbr_lyr) = [100, 150, 200, 250, 300];  
 
 % SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
 
-rds_snw(1:nbr_lyr) = [1000,200,300,300,300];
+rds_snw(1:nbr_lyr) = [417 192 202 250 300];
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()
@@ -130,7 +129,7 @@ rds_coated(1:nbr_lyr) = ["0","0","0","0","0"];
 nbr_aer = 16;
 
 
-for x = [2e6]   % for reference: 1e3 = 1ug/g (1000 ppb or 1 ppm)
+for x = [16e5]   % for reference: 1e3 = 1ug/g (1000 ppb or 1 ppm)
                   % 1 e6 = 1000ug = 1mg
 
 % PARTICLE MASS MIXING RATIOS (units: ng(species)/g(ice), or ppb)
@@ -142,7 +141,7 @@ mss_cnc_dst3(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 3
 mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
 mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
 mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
-mss_cnc_bio2(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 2
+mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2
 mss_cnc_bio3(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 3
 mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
@@ -230,15 +229,19 @@ flx_abs_snw % absorbed energy in the snowpack
 %%%%%%%%%%%%%%%%%% USER DEFINED VARIABLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-initial_T = [273.15, 273.15, 273.15, 273.15, 273.15]; % melting snow pack - isothermal?
+initial_T = [273.15 273.15 273.15 240 245]; % melting snow pack - isothermal?
 initial_T = initial_T(:); % convert to 1 column vector
 
 initial_TG = initial_T(1) - initial_T(end) / sum(dz); % initial temp gradient (0 for isothermal)
 
-fliqs = [0.1, 0.2, 0.3, 0.4, 0.5]; % initial water fraction per layer
+fliqs = [0.08 0 0 0 0];
+fliq_max = 0.2; % max liquid water fraction that can be held by a layer without initiating percolation
+perc_threshold = 0.01;
+
+% initial water fraction per layer
 fliqs = fliqs(:);
 
-f_refs = [0, 0, 0.1, 0.1, 0.1]; % initial refrozen ice fraction per layer
+f_refs = [0, 0, 0, 0, 0]; % initial refrozen ice fraction per layer
 f_refs = f_refs(:);
 
 doubling_time = 3; % must be the same as in CASPA (default = 3)
@@ -255,7 +258,9 @@ T = initial_T + heat_timestep;
 snow_depth = sum(dz); % depth of snowpack incorporating all layers
 temp_grad = ((T(1) - T(end)))/snow_depth; % temperature gradient through snowpack
  
-new_r = zeros(nbr_lyr,1); % set up empty array for new grain radius
+new_r = zeros(nbr_lyr,1); % set up empty array for new grain radius % set up empty array for new temperature profile
+new_fliqs = zeros(nbr_lyr,1);
+new_f_refs = zeros(nbr_lyr,1);
 
 for i = 1:1:nbr_lyr   % iterate through each vertical layer
     % assign input values
@@ -264,22 +269,65 @@ for i = 1:1:nbr_lyr   % iterate through each vertical layer
     r = rds_snw(i);
     temp = T(i);
     TG = temp_grad;
-    doubling_time = doubling_time; % required to convert timestep into days
     fliq = fliqs(i); % assign liquid water fraction
     f_ref = f_refs(i);
     r_new = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq,f_ref); % function call from grain_size_evolution.m
     new_r(i) = r_new; % append new radius into array
-   
+    
+    if T(i) >= 273.15
+        T(i) = 273.15; % reset T to melting point and assume excess energy is dissipated in melting ice
+        new_fliqs(i) = fliqs(i) + 0.01; % if layer is melting, add constant 1% to liquid water fraction
+    end
+end
+
+% The following loop percolates new liquid water down through the snowpack.
+% Regardless of the layer the water forms in, it will immediately percolate
+% to the bottom, then accumulate from bottom up. There is a percolation
+% threshold. If the liquid water fraction exceeds that threshold, liquid
+% water percolates downwards, provided the layer beneath its max capacity 
+% (fliq_max). 
+
+for i = 1:1:nbr_lyr-1
+    % if higher layer contains more water than lower layer, higher layer exceeds percolation threshols and lower layer is not at max liquid water fraction-
+    % percolate down
+    if new_fliqs(i) > new_fliqs(i+1) && new_fliqs(i) > perc_threshold  && new_fliqs(i+1) < fliq_max 
+        c = new_fliqs(i)-new_fliqs(i+1)-perc_threshold; % c = difference in water fractions between upper and lower layer
+        new_fliqs(i+1) = new_fliqs(i+1)+c; % add difference to lower layer
+        new_fliqs(i) = new_fliqs(i)-c; % remove difference from higher layer
+    end
+end
+
+% At the end of the timestep, check whether liquid water exists in layers where temp is below freezing.
+% If so, turn this liquid water fraction into refrozen fraction. Raise
+% warnings if liquid and refrozen fractions together exceed 1, and also
+% raise a flag if the user should include a liquid water film in the next
+% timestep.
+
+for i = 1:1:nbr_lyr
+    if new_fliqs(i) > 0 && T(i) < 273.15
+        new_f_refs(i) = f_refs(i) + new_fliqs(i);
+        new_fliqs(i) = 0;
+    end
+    
     if f_ref + fliq >= 1
         check = "LIQUID & REFROZEN FRACTIONS EXCEED 1: CHANGE!!!" % Alert user if liquid/refrozen fractions too high
     end
     
     if temp > 273.15
-        ADD_WATER = "LAYER " + num2str(i) + " melting: add liquid water film"
+        ADD_WATER = "LAYER " + num2str(i) + " melting: add liquid water film" % Alert user to add water film b/c ice is melting
     end
-    
 end
 
+% 
+% OUTPUT UPDATED SNOW PHYSICAL PARAMS FOR NEXT RUN (i.e in next run update the inout params according to...
+% rds_snow = new_r
+% initial_T = new_T
+% fliqs = new_fliqs
+% f_refs = new_f_refs
+
 new_r
+T
+new_fliqs
+new_f_refs
 
 end
