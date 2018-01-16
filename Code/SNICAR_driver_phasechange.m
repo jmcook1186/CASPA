@@ -90,7 +90,7 @@ R_sfc    = 0.15;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
-dz       = [0.05 0.05 0.05 0.05 0.8];
+dz       = [0.05 0.05 0.05 0.05 0.05];
 
 nbr_lyr  = length(dz);  % number of snow layers
 
@@ -141,7 +141,7 @@ mss_cnc_dst3(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 3
 mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
 mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
 mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
-mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2
+mss_cnc_bio2(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 2
 mss_cnc_bio3(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 3
 mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
@@ -190,6 +190,7 @@ flx_abs(1)     = data_in(6,4); % top layer solar absorption
 flx_vis_abs(1) = data_in(7,4); % top layer VIS absorption
 flx_nir_abs(1) = data_in(8,4); % top layer NIR absorption
 heat_rt = data_in([1:5],6); % heating rate per layer K/hr
+F_abs = [data_in(6,4),data_in(9,4),data_in(12,4),data_in(15,4),data_in(18,4)]; % absorbed energy per layer (W/m2)
 %albedo = smooth(albedo,0.005); % add a simple smoothing function with short period
 
 
@@ -255,7 +256,7 @@ heat_day = heat_rt.*24; % heating over day
 heat_timestep = heat_day * 3; % heating over timestep (1 timestep = 3 days)
 
 % CONSTANTS
-CICE = 2.11727e3; % Specific heat capcity of ice J/kg/K
+CICE = 2.11727e3; % Specific heat capacity of ice J/kg/K
 CWAT = 4.188e3; % Specific heat capacity of water J/kg/K
 Lf = 3.337e5; % Latent heat of fusion J/kg
 
@@ -269,8 +270,8 @@ new_r = zeros(nbr_lyr,1); % set up empty array for new grain radius
 new_T = zeros(nbr_lyr,1) % set up empty array for new temperature profile
 new_fliqs = zeros(nbr_lyr,1); 
 new_f_refs = zeros(nbr_lyr,1);
-new_I_mass = zeros(nbr_lyr,1);
-new_W_mass = zeros(nbr_lyr,1);
+new_i_mass = zeros(nbr_lyr,1);
+new_w_mass = zeros(nbr_lyr,1);
 
 for i = 1:1:nbr_lyr   % iterate through each vertical layer
     % assign input values
@@ -287,15 +288,15 @@ for i = 1:1:nbr_lyr   % iterate through each vertical layer
     
         if T(i) >= 273.15  % if layer temp is greater than freezing point, initiate melting code to update liquid water fraction per layer...
             
-            T_excess = T(i) - 273.15; % calculate residual T that could be used for melting          
+            T_excess(i) = T(i) - 273.15; % calculate residual T that could be used for melting          
             mass_ice(i) = dz(i) * rho_snw(i); % mass of ice = layer thickness * density
             mass_wat(i) = ((mass_ice(i)/917)*1000) * fliqs(i); % mass of water = (mass of ice converted to mass of water, multiplied by liquid water fraction)
-            c = (mass_wat(i) / dz(i) * CWAT) +  (mass_ice(i) / dz(i) * CICE); % c is the volumetric snow/soil heat capacity (J m-3 K-1)
-            E_excess(i) = dz(i) * T_excess * c; % excess energy = excess heat (K) * layer thickness (m) * specific heat capacity of snow (J/m3/K) (OVER TIMESTEP)
-            W_change(i) = E_excess(i) / Lf; % change in water mass = excess energy / energy required to melt ice (latent heat of fusion)
-            new_W_mass(i) = mass_wat(i) + W_change(i); % updated water mass = old + change
-            new_I_mass(i) = i_mass(i) - W_change(i); % ice converted to water, so subtract change in water mass from initial ice mass
-            new_fliqs(i) = new_W_mass(i) / new_I_mass(i); % new liquid water fraction
+            c(i) = (mass_wat(i) / dz(i) * CWAT) +  (mass_ice(i) / dz(i) * CICE); % c is the volumetric ice/water heat capacity (J m-3 K-1)
+            E_excess(i) = T_excess(i) * c(i); % excess energy (J/m3) = excess heat (K)* volumetric specific heat capacity of ice/water mix (J/m3/K) (OVER TIMESTEP)
+            W_change(i) = E_excess(i) / Lf; % change in ice mass = excess energy / energy required to melt ice (latent heat of fusion)
+            new_w_mass(i) = mass_wat(i) + W_change(i); % updated water mass = old + change
+            new_i_mass(i) = i_mass(i) - W_change(i); % ice converted to water, so subtract change in water mass from initial ice mass
+            new_fliqs(i) = new_w_mass(i) / new_i_mass(i); % new liquid water fraction
             % using this scheme assumes all excess energy is dissipated in
             % phase change ice -> water. Amount of excess energy determines
             % mass of water produced

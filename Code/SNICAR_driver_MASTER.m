@@ -74,22 +74,22 @@ R_sfc    = 0.15;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
-dz       = [0.05 0.05 0.05 0.05 0.8];
+dz       = [0.05 0.05 0.05 0.05 0.05];
  
 nbr_lyr  = length(dz);  % number of snow layers
 
 % SNOW DENSITY OF EACH LAYER (units: kg/m3)
-rho_snw(1:nbr_lyr) = [400,400,400,500,500];  
+rho_snw(1:nbr_lyr) = [200, 200, 200, 200, 200];  
 
 
 % SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
 
-rds_snw(1:nbr_lyr) = [1000,2000,3000,3000,3000];
+rds_snw(1:nbr_lyr) = [0, 1000, 1000, 1000, 1000];
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()
 % rds_coated should be input as strings.
-rds_coated(1:nbr_lyr) = ["0","0","0","0","0"];
+rds_coated(1:nbr_lyr) = ["1000_400","0","0","0","0"];
 
 
 % NUMBER OF AEROSOL SPECIES IN SNOW (ICE EXCLUDED)
@@ -133,8 +133,8 @@ mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
 mss_cnc_bio6(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
 mss_cnc_bio7(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 7
-mss_cnc_hematite(1:nbr_lyr) = [33590,0,0,0,0];   % Water, 2 mm spheres
-mss_cnc_mixed_sand(1:nbr_lyr) = [508422,0,0,0,0];
+mss_cnc_hematite(1:nbr_lyr) = [0,0,0,0,0];   % Water, 2 mm spheres
+mss_cnc_mixed_sand(1:nbr_lyr) = [0,0,0,0,0];
 
 
 % FILE NAMES CONTAINING MIE PARAMETERS FOR ALL AEROSOL SPECIES:
@@ -156,6 +156,7 @@ fl_hematite  = 'Hematite.nc'; % Biological impurity 6 (50um diameter, pigs as pe
 fl_mixed_sand  = 'mixed_sand.nc'; % Mixed sand (quartz and clays)
 
 % call SNICAR with these inputs:
+
 data_in = snicar8d(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, ...
     dz, rho_snw, rds_snw, rds_coated, nbr_aer, mss_cnc_sot1, ...
     mss_cnc_sot2, mss_cnc_dst1, mss_cnc_dst2, ...
@@ -176,6 +177,8 @@ flx_abs(1)     = data_in(6,4); % top layer solar absorption
 flx_vis_abs(1) = data_in(7,4); % top layer VIS absorption
 flx_nir_abs(1) = data_in(8,4); % top layer NIR absorption
 heat_rt = data_in([1:5],6); % heating rate per layer K/hr
+F_abs = [data_in(6,4),data_in(9,4),data_in(12,4),data_in(15,4),data_in(18,4)]; % absorbed energy per layer (W/m2)
+
 %albedo = smooth(albedo,0.005); % add a simple smoothing function with short period
 
 
@@ -198,12 +201,11 @@ bgslope = ((albedo(26)-albedo(18))/0.075);
 
 %Report albedo
 alb_slr % albedo over solar spectrum
-flx_abs_snw % absorbed energy in the snowpack
-heat_rt; % radiative heating rate in K/hr
-
+%flx_abs_snw % absorbed energy in the snowpack
+%heat_rt; % radiative heating rate in K/hr
 
 snow_depth = sum(dz); % depth of snowpack incorporating all layers
-temp_grad = ((heat_rt(1) - heat_rt(end)))/snow_depth % temperature gradient through snowpack
+temp_grad = ((heat_rt(1) - heat_rt(end)))/snow_depth; % temperature gradient through snowpack
 
 
 end

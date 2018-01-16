@@ -425,6 +425,7 @@ for n=1:nbr_lyr
 
     % single-scatter albedo, mass extinction coefficient, and
     % asymmetry paramater
+    
     omega_snw(:,n)       = ncread(fl_in,'ss_alb');
     ext_cff_mss_snw(:,n) = ncread(fl_in,'ext_cff_mss');
     g_snw(:,n)           = ncread(fl_in,'asm_prm');
@@ -994,6 +995,14 @@ data_out(19,4) = F_abs_vis_btm; % VIS absorption by underlying surface
 data_out(20,4) = F_abs_nir_btm; % NIR absorption by underlying surface
 data_out(21,4) = sum((mu_not*pi*Fs))+sum(Fd);  % total downwelling energy on upper boundary
 data_out([1:5],6) = heat_rt; % JC EDIT output radiative heating rate in each layer in K/hr 
+
+% F_abs_top = data_out(6,4);
+% F_abs_scnd = data_out(9,4);
+% F_abs_thrd = data_out(12,4);
+% F_abs_frth = data_out(15,4);
+% F_abs_btm = data_out(18,4);
+
+
 
 % plot modeled albedo:
 if (1==0)
