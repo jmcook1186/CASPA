@@ -90,7 +90,7 @@ R_sfc    = 0.15;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
-dz       = [0.05 0.05 0.05 0.05 0.8];
+dz       = [0.05 0.05 0.05 0.05 0.05];
 
 nbr_lyr  = length(dz);  % number of snow layers
 
@@ -141,7 +141,7 @@ mss_cnc_dst3(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 3
 mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
 mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
 mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
-mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2
+mss_cnc_bio2(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 2
 mss_cnc_bio3(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 3
 mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
@@ -221,7 +221,7 @@ flx_abs_snw % absorbed energy in the snowpack
 % variables and a call to a function (grain_size_evolution) in a separate
 % script (grain_evolution.m) saved in the working directory. The separate
 % script requires access to a lookup table (drdt_bst_fit_100.mat) saved in
-% the working doirectory. This snow grain evolution calculation is an
+% the working directory. This snow grain evolution calculation is an
 % implementation of the parameterisation described by Flanner and Zender
 % (2006) and used in the CLM model
 % (http://www.cesm.ucar.edu/models/cesm1.0/clm/CLM4_Tech_Note.pdf).
@@ -235,7 +235,7 @@ initial_T = initial_T(:); % convert to 1 column vector
 
 initial_TG = initial_T(1) - initial_T(end) / sum(dz); % initial temp gradient (0 for isothermal)
 
-fliqs = [0.08 0 0 0 0];
+fliqs = [0 0 0 0 0];
 fliq_max = 0.2; % max liquid water fraction that can be held by a layer without initiating percolation
 perc_threshold = 0.01;
 
@@ -248,20 +248,30 @@ f_refs = f_refs(:);
 doubling_time = 3; % must be the same as in CASPA (default = 3)
 r0 = 100; % reff of fresh snow
 
+i_mass = dz .* rho_snw;
 
 % VARIABLES FROM SNICAR
 heat_rt; % radiative heating rate in K/hr
 heat_day = heat_rt.*24; % heating over day
 heat_timestep = heat_day * 3; % heating over timestep (1 timestep = 3 days)
 
+% CONSTANTS
+CICE = 2.11727e3; % Specific heat capacity of ice J/kg/K
+CWAT = 4.188e3; % Specific heat capacity of water J/kg/K
+Lf = 3.337e5; % Latent heat of fusion J/kg
+
+
 % CALCULATION
 T = initial_T + heat_timestep;
 snow_depth = sum(dz); % depth of snowpack incorporating all layers
 temp_grad = ((T(1) - T(end)))/snow_depth; % temperature gradient through snowpack
  
-new_r = zeros(nbr_lyr,1); % set up empty array for new grain radius % set up empty array for new temperature profile
-new_fliqs = zeros(nbr_lyr,1);
+new_r = zeros(nbr_lyr,1); % set up empty array for new grain radius
+new_T = zeros(nbr_lyr,1) % set up empty array for new temperature profile
+new_fliqs = zeros(nbr_lyr,1); 
 new_f_refs = zeros(nbr_lyr,1);
+new_i_mass = zeros(nbr_lyr,1);
+new_w_mass = zeros(nbr_lyr,1);
 
 for i = 1:1:nbr_lyr   % iterate through each vertical layer
     % assign input values
@@ -270,15 +280,27 @@ for i = 1:1:nbr_lyr   % iterate through each vertical layer
     r = rds_snw(i);
     temp = T(i);
     TG = temp_grad;
+    doubling_time = doubling_time; % required to convert timestep into days
     fliq = fliqs(i); % assign liquid water fraction
     f_ref = f_refs(i);
     r_new = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq,f_ref); % function call from grain_size_evolution.m
     new_r(i) = r_new; % append new radius into array
     
-    if T(i) >= 273.15
-        T(i) = 273.15; % reset T to melting point and assume excess energy is dissipated in melting ice
-        new_fliqs(i) = fliqs(i) + 0.01; % if layer is melting, add constant 1% to liquid water fraction
-    end
+        if T(i) >= 273.15  % if layer temp is greater than freezing point, initiate melting code to update liquid water fraction per layer...
+            
+            T_excess(i) = T(i) - 273.15; % calculate residual T that could be used for melting          
+            mass_ice(i) = dz(i) * rho_snw(i); % mass of ice = layer thickness * density
+            mass_wat(i) = ((mass_ice(i)/917)*1000) * fliqs(i); % mass of water = (mass of ice converted to mass of water, multiplied by liquid water fraction)
+            c(i) = (mass_wat(i) / dz(i) * CWAT) +  (mass_ice(i) / dz(i) * CICE); % c is the volumetric ice/water heat capacity (J m-3 K-1)
+            E_excess(i) = T_excess(i) * c(i); % excess energy (J/m3) = excess heat (K)* volumetric specific heat capacity of ice/water mix (J/m3/K) (OVER TIMESTEP)
+            W_change(i) = E_excess(i) / Lf; % change in ice mass = excess energy / energy required to melt ice (latent heat of fusion)
+            new_w_mass(i) = mass_wat(i) + W_change(i); % updated water mass = old + change
+            new_i_mass(i) = i_mass(i) - W_change(i); % ice converted to water, so subtract change in water mass from initial ice mass
+            new_fliqs(i) = new_w_mass(i) / new_i_mass(i); % new liquid water fraction
+            % using this scheme assumes all excess energy is dissipated in
+            % phase change ice -> water. Amount of excess energy determines
+            % mass of water produced
+        end
 end
 
 % The following loop percolates new liquid water down through the snowpack.
@@ -292,9 +314,9 @@ for i = 1:1:nbr_lyr-1
     % if higher layer contains more water than lower layer, higher layer exceeds percolation threshols and lower layer is not at max liquid water fraction-
     % percolate down
     if new_fliqs(i) > new_fliqs(i+1) && new_fliqs(i) > perc_threshold  && new_fliqs(i+1) < fliq_max 
-        c = new_fliqs(i)-new_fliqs(i+1)-perc_threshold; % c = difference in water fractions between upper and lower layer
-        new_fliqs(i+1) = new_fliqs(i+1)+c; % add difference to lower layer
-        new_fliqs(i) = new_fliqs(i)-c; % remove difference from higher layer
+        p = new_fliqs(i)-new_fliqs(i+1)-perc_threshold; % p = difference in water fractions between upper and lower layer
+        new_fliqs(i+1) = new_fliqs(i+1)+p; % add difference to lower layer
+        new_fliqs(i) = new_fliqs(i)-p; % remove difference from higher layer
     end
 end
 
@@ -319,6 +341,8 @@ for i = 1:1:nbr_lyr
     end
 end
 
+
+
 % 
 % OUTPUT UPDATED SNOW PHYSICAL PARAMS FOR NEXT RUN (i.e in next run update the inout params according to...
 % rds_snow = new_r
@@ -327,7 +351,7 @@ end
 % f_refs = new_f_refs
 
 new_r
-T
+new_T
 new_fliqs
 new_f_refs
 
