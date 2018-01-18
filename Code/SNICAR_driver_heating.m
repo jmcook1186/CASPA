@@ -190,6 +190,7 @@ flx_abs(1)     = data_in(6,4); % top layer solar absorption
 flx_vis_abs(1) = data_in(7,4); % top layer VIS absorption
 flx_nir_abs(1) = data_in(8,4); % top layer NIR absorption
 heat_rt = data_in([1:5],6); % heating rate per layer K/hr
+F_abs = [data_in(6,4),data_in(9,4),data_in(12,4),data_in(15,4),data_in(18,4)]; % absorbed energy per layer (W/m2)
 %albedo = smooth(albedo,0.005); % add a simple smoothing function with short period
 
 
