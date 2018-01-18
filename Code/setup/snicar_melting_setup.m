@@ -113,7 +113,7 @@ mss_cnc_dst3(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 3
 mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
 mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
 mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
-mss_cnc_bio2(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 2
+mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2
 mss_cnc_bio3(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 3
 mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
@@ -249,7 +249,7 @@ for i = 1:1:nbr_lyr   % iterate through each vertical layer
             E_excess(i) = T_excess(i) * c(i); % excess energy (J/m3) = excess heat (K)* volumetric specific heat capacity of ice/water mix (J/m3/K) (OVER TIMESTEP)
             W_change(i) = E_excess(i) / Lf; % change in ice mass = excess energy / energy required to melt ice (latent heat of fusion)
             new_w_mass(i) = mass_wat(i) + W_change(i); % updated water mass = old + change
-            new_i_mass(i) = i_mass(i) - W_change(i); % ice converted to water, so subtract change in water mass from initial ice mass
+            new_i_mass(i) = i_mass(i) - W_change(i) % ice converted to water, so subtract change in water mass from initial ice mass
             new_fliqs(i) = new_w_mass(i) / new_i_mass(i); % new liquid water fraction
             % using this scheme assumes all excess energy is dissipated in
             % phase change ice -> water. Amount of excess energy determines
