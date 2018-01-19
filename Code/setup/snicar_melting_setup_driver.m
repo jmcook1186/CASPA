@@ -57,7 +57,7 @@ f_refs_list(1,[1:length(f_refs_init)]) = f_refs_init;
 fliqs_list(1,[1:length(fliqs_init)]) = fliqs_init;
 rds_list(1,[1:length(rds_snw_init)]) = rds_snw_init;
 wat_coat_thickness(1,[1:length(wat_coat_init)]) = wat_coat_init;
-
+dz_list(1,[1:length(dz_init)]) = dz_init;
 
 %%%%%%% BEGIN RUN 1 %%%%%%%%%%%%%
 [overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
@@ -70,6 +70,7 @@ f_refs_list(2,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(2,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(2,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(2,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(2,[1:length(dz_init)]) = dz_init;
 
 % update outputs for next run
 x_init = x_init*2;
@@ -77,7 +78,7 @@ Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%% BEGIN RUN 2  %%%%%%%%%%%%
 
@@ -90,13 +91,14 @@ f_refs_list(3,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(3,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(3,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(3,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(3,[1:length(dz_init)]) = dz_init;
 
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
 x_init = x_init*2;
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 3 %%%%%%%%%%
 
@@ -107,13 +109,14 @@ f_refs_list(4,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(4,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(4,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(4,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(4,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 4 %%%%%%%%%%
 
@@ -124,13 +127,14 @@ f_refs_list(5,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(5,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(5,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(5,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(5,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 5 %%%%%%%%%%
 
@@ -141,13 +145,14 @@ f_refs_list(6,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(6,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(6,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(6,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(6,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 6 %%%%%%%%%%
 
@@ -158,13 +163,14 @@ f_refs_list(7,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(7,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(7,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(7,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(7,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 7 %%%%%%%%%%
 
@@ -175,6 +181,7 @@ f_refs_list(8,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(8,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(8,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(8,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(8,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
@@ -192,13 +199,14 @@ f_refs_list(9,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(9,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(9,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(9,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(9,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 9 %%%%%%%%%%
 
@@ -209,13 +217,14 @@ f_refs_list(10,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(10,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(10,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(10,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(10,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 10 %%%%%%%%%%
 
@@ -226,13 +235,14 @@ f_refs_list(11,[1:length(f_refs_init)]) = new_f_refs;
 fliqs_list(11,[1:length(fliqs_init)]) = new_fliqs;
 rds_list(11,[1:length(rds_snw_init)]) = round(overall_new_r);
 wat_coat_thickness(11,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+dz_list(11,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%% CREATE OUTPUT CSV %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -245,11 +255,11 @@ f_ref_table = array2table(f_refs_list,'VariableNames',{'f_ref_top','f_ref_z2','f
 fliqs_table = array2table(fliqs_list,'VariableNames',{'fliqs_top','fliqs_z2','fliqs_z3','fliqs_z4','fliqs_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 rds_table = array2table(rds_list,'VariableNames',{'r_top','r_z2','r_z3','r_z4','r_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 wat_coat_table = array2table(wat_coat_thickness,'VariableNames',{'w_coat_top','wat_coat_z2','wat_coat_z3','wat_coat_z4','wat_coat_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
-
+dz_table = array2table(dz_list,'VariableNames',{'dz_top','dz_z2','dz_z3','dz_z4','dz_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 %concatenate tables into one large output table (currently only relevant
 %variables for creating snicar instances (x, rds, water coat thickness)
 
-output_table = [x_table,rds_table,wat_coat_table]
+output_table = [x_table,dz_table,rds_table,wat_coat_table]
 
 
 % Write table to csv

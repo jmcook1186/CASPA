@@ -70,7 +70,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [overall_new_r, new_f_refs, new_T, new_fliqs, dz] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz, rho_snw, rds_snw, rds_coated, x, initial_T, fliqs, f_refs)
+function [overall_new_r, new_f_refs, new_T, new_fliqs, new_dz] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz, rho_snw, rds_snw, rds_coated, x, initial_T, fliqs, f_refs)
 
 
 
@@ -300,7 +300,7 @@ for i = 1:1:nbr_lyr
         ADD_WATER = "LAYER " + num2str(i) + " melting: add liquid water film" % Alert user to add water film b/c ice is melting
     end
     
-    new_i_mass(i) = i_mass(i) + (new_fliqs(i)*1000); % calculate mass of each layer (inc those below freezing) after percolation) 
+    new_i_mass(i) = i_mass(i) * (1 + new_f_refs(i)) * (1 - new_fliqs(i)); % calculate mass of each layer (inc those below freezing) after percolation) 
     
     new_dz(i) = new_i_mass(i) /rho_snw(i); % update layer thickness
         
@@ -320,7 +320,7 @@ overall_new_r = ((new_r.*(100-new_f_refs)) + (new_f_refs.*1500)) / 100 ;
 % below
 
 
-
+new_fliqs
 
 
 end
