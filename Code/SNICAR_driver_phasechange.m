@@ -340,6 +340,10 @@ for i = 1:1:nbr_lyr
     if new_fliqs(i) > 0
         ADD_WATER = "LAYER " + num2str(i) + " melting: add liquid water film" % Alert user to add water film b/c ice is melting
     end
+    
+    new_i_mass(i) = i_mass(i) + (new_fliqs(i)*1000); % calculate mass of each layer (inc those below freezing) after percolation)
+    
+    new_dz(i) = new_i_mass(i) /rho_snw(i); % update layer thickness
 end
 
 % the layer must be described using one representative effective radius.

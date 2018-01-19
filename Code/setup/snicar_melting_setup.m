@@ -287,7 +287,6 @@ for i = 1:1:nbr_lyr
     if new_fliqs(i) < 0
         new_fliqs(i) = 0; % if new < old, it can't have -ve water, so reset to zero.
     end
-    
     if new_fliqs(i) > 0 && T(i) < 273.15
         new_f_refs(i) = f_refs(i) + new_fliqs(i);
         new_fliqs(i) = 0;
@@ -300,7 +299,13 @@ for i = 1:1:nbr_lyr
     if new_fliqs(i) > 0
         ADD_WATER = "LAYER " + num2str(i) + " melting: add liquid water film" % Alert user to add water film b/c ice is melting
     end
+    
+    new_i_mass(i) = i_mass(i) + (new_fliqs(i)*1000); % calculate mass of each layer (inc those below freezing) after percolation) 
+    
+    new_dz(i) = new_i_mass(i) /rho_snw(i); % update layer thickness
+        
 end
+
 
 % the layer must be described using one representative effective radius.
 % Since we assume refrozen water to have reff = 1500um, the overall radius
@@ -308,6 +313,15 @@ end
 % (weighted by new_f_refs)
 
 overall_new_r = ((new_r.*(100-new_f_refs)) + (new_f_refs.*1500)) / 100 ;
+
+
+% Finally, ensure that the layer thickness cannot drop below a certain
+% threshold. If this treshold is reached, the layer  is merged with the one
+% below
+
+
+
+
 
 end
 
