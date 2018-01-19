@@ -70,17 +70,42 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [overall_new_r, new_f_refs, new_T, new_fliqs, dz] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz, rho_snw, rds_snw, rds_coated, x, initial_T, fliqs, f_refs)
+clear;
+
+% RADIATIVE TRANSFER CONFIGURATION:
+BND_TYP  = 1;        % 1= 470 spectral bands
+DIRECT   = 1;        % 1= Direct-beam incident flux, 0= Diffuse incident flux
+APRX_TYP = 1;        % 1= Eddington, 2= Quadrature, 3= Hemispheric Mean
+DELTA    = 1;        % 1= Apply Delta approximation, 0= No delta
+
+% COSINE OF SOLAR ZENITH ANGLE FOR DIRECT-BEAM
+coszen   = 0.50;
+
+% REFLECTANCE OF SURFACE UNDERLYING SNOW:
+%   Value is applied to all wavelengths.
+%   User can also specify spectrally-dependent ground albedo
+%   internally in snicar8d.m
+
+R_sfc    = 0.15;
 
 
+% SNOW LAYER THICKNESSES (array) (units: meters):
+dz       = [0.05 0.05 0.05 0.05 0.05];
 
 nbr_lyr  = length(dz);  % number of snow layers
 
+% SNOW DENSITY OF EACH LAYER (units: kg/m3)
 
+rho_snw(1:nbr_lyr) = [100, 150, 200, 250, 300];  
+
+% SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
+
+rds_snw(1:nbr_lyr) = [417 192 202 250 300];
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()
 
+rds_coated(1:nbr_lyr) = ["0","0","0","0","0"];
 
 % NUMBER OF AEROSOL SPECIES IN SNOW (ICE EXCLUDED)
 %  Species numbers (used in snicar8d.m) are:
@@ -104,6 +129,9 @@ nbr_lyr  = length(dz);  % number of snow layers
 nbr_aer = 16;
 
 
+for x = [16e5]   % for reference: 1e3 = 1ug/g (1000 ppb or 1 ppm)
+                  % 1 e6 = 1000ug = 1mg
+
 % PARTICLE MASS MIXING RATIOS (units: ng(species)/g(ice), or ppb)
 mss_cnc_sot1(1:nbr_lyr)  = [0,0,0,0,0];  % uncoated black carbon
 mss_cnc_sot2(1:nbr_lyr)  = [0,0,0,0,0];    % coated black carbon
@@ -113,7 +141,7 @@ mss_cnc_dst3(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 3
 mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
 mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
 mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
-mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2
+mss_cnc_bio2(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 2
 mss_cnc_bio3(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 3
 mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
@@ -166,6 +194,20 @@ F_abs = [data_in(6,4),data_in(9,4),data_in(12,4),data_in(15,4),data_in(18,4)]; %
 %albedo = smooth(albedo,0.005); % add a simple smoothing function with short period
 
 
+figure(1);
+
+% make a plot of spectrally-resolved albedo:
+plot(wvl,albedo,'linewidth',3);
+xlabel('Wavelength (\mum)','fontsize',20);
+ylabel('Albedo','fontsize',20);
+set(gca,'xtick',0:0.1:5,'fontsize',16);
+set(gca,'ytick',0:0.1:1.0,'fontsize',16);
+xlim([0.3 2.5])
+ylim([0,1])
+grid on;
+hold on;
+
+
 %Report albedo
 
 alb_slr % albedo over solar spectrum
@@ -193,8 +235,8 @@ initial_T = initial_T(:); % convert to 1 column vector
 
 initial_TG = initial_T(1) - initial_T(end) / sum(dz); % initial temp gradient (0 for isothermal)
 
-fliqs = [0 0 0 0 0];
-fliq_max = 0.2; % max liquid water fraction that can be held by a layer without initiating percolation
+fliqs = [0.1 0 0 0 0];
+fliq_max = 0.3; % max liquid water fraction that can be held by a layer without initiating percolation
 perc_threshold = 0.01;
 
 
@@ -253,7 +295,6 @@ for i = 1:1:nbr_lyr   % iterate through each vertical layer
             new_w_mass(i) = mass_wat(i) + W_change(i); % updated water mass = old + change
             new_i_mass(i) = i_mass(i) - W_change(i); % ice converted to water, so subtract change in water mass from initial ice mass
             new_fliqs(i) = new_w_mass(i) / new_i_mass(i); % new liquid water fraction
-            
             % using this scheme assumes all excess energy is dissipated in
             % phase change ice -> water. Amount of excess energy determines
             % mass of water produced
@@ -268,6 +309,9 @@ end
 % (fliq_max). 
 
 for i = 1:1:nbr_lyr-1
+    if new_fliqs(i) < 0
+        new_fliqs(i) = 0; % if new < old, it can't have -ve water, so reset to zero.
+    end
     % if higher layer contains more water than lower layer, higher layer exceeds percolation threshols and lower layer is not at max liquid water fraction-
     % percolate down
     if new_fliqs(i) > new_fliqs(i+1) && new_fliqs(i) > perc_threshold  && new_fliqs(i+1) < fliq_max 
@@ -284,10 +328,6 @@ end
 % timestep.
 
 for i = 1:1:nbr_lyr
-    if new_fliqs(i) < 0
-        new_fliqs(i) = 0; % if new < old, it can't have -ve water, so reset to zero.
-    end
-    
     if new_fliqs(i) > 0 && T(i) < 273.15
         new_f_refs(i) = f_refs(i) + new_fliqs(i);
         new_fliqs(i) = 0;
@@ -309,6 +349,18 @@ end
 
 overall_new_r = ((new_r.*(100-new_f_refs)) + (new_f_refs.*1500)) / 100 ;
 
+
+% OUTPUT UPDATED SNOW PHYSICAL PARAMS FOR NEXT RUN (i.e in next run update the inout params according to...
+% rds_snow = new_r
+% initial_T = new_T
+% fliqs = new_fliqs
+% f_refs = new_f_refs
+
+new_r
+new_T
+new_fliqs
+new_f_refs
+overall_new_r
+
+
 end
-
-
