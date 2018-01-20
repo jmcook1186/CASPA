@@ -72,11 +72,7 @@
 
 function [overall_new_r, new_f_refs, new_T, new_fliqs, new_dz] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz, rho_snw, rds_snw, rds_coated, x, initial_T, fliqs, f_refs)
 
-
-
 nbr_lyr  = length(dz);  % number of snow layers
-
-
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()
@@ -165,11 +161,12 @@ heat_rt = data_in([1:5],6); % heating rate per layer K/hr
 F_abs = [data_in(6,4),data_in(9,4),data_in(12,4),data_in(15,4),data_in(18,4)]; % absorbed energy per layer (W/m2)
 %albedo = smooth(albedo,0.005); % add a simple smoothing function with short period
 
-
 %Report albedo
 
-alb_slr % albedo over solar spectrum
-flx_abs_snw % absorbed energy in the snowpack
+alb_slr; % albedo over solar spectrum
+flx_abs_snw; % absorbed energy in the snowpack
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,78 +184,73 @@ flx_abs_snw % absorbed energy in the snowpack
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% USER DEFINED VARIABLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-initial_T = [273.15 273.15 273.15 240 245]; % melting snow pack - isothermal?
-initial_T = initial_T(:); % convert to 1 column vector
-
-initial_TG = initial_T(1) - initial_T(end) / sum(dz); % initial temp gradient (0 for isothermal)
-
-fliqs = [0 0 0 0 0];
-fliq_max = 0.2; % max liquid water fraction that can be held by a layer without initiating percolation
-perc_threshold = 0.01;
-
-
-f_refs = [0, 0, 0, 0, 0]; % initial refrozen ice fraction per layer
-
-doubling_time = 3; % must be the same as in CASPA (default = 3)
-r0 = 100; % reff of fresh snow
-
-i_mass = dz .* rho_snw;
-w_mass = dz .* rho_snw.*fliqs;
-
-% VARIABLES FROM SNICAR
-heat_rt; % radiative heating rate in K/hr
-heat_day = heat_rt.*24; % heating over day
-heat_timestep = heat_day * 3; % heating over timestep (1 timestep = 3 days)
-
-% CONSTANTS
-CICE = 2.11727e3; % Specific heat capacity of ice J/kg/K
-CWAT = 4.188e3; % Specific heat capacity of water J/kg/K
-Lf = 3.337e5; % Latent heat of fusion J/kg
-
-
-% CALCULATION
-T = initial_T + heat_timestep;
-snow_depth = sum(dz); % depth of snowpack incorporating all layers
-temp_grad = ((T(1) - T(end)))/snow_depth; % temperature gradient through snowpack
- 
 new_r = zeros(nbr_lyr,1); % set up empty array for new grain radius
-new_T = zeros(nbr_lyr,1) % set up empty array for new temperature profile
+new_T = zeros(nbr_lyr,1); % set up empty array for new temperature profile
 new_fliqs = zeros(nbr_lyr,1); 
 new_f_refs = zeros(nbr_lyr,1);
 new_i_mass = zeros(nbr_lyr,1);
 new_w_mass = zeros(nbr_lyr,1);
 
+
+fliq_max = 0.2; % max water fraction that can be held by a layer
+perc_threshold = 0.01; % max liquid water fraction that can be held by a layer without initiating percolation
+doubling_time = 3; % must be the same as in CASPA (default = 3)
+r0 = 100; % reff of fresh snow
+i_mass = dz .* rho_snw; % (m * kgm-1)
+w_mass = dz .* rho_snw.*fliqs; % (m * kgm-1)
+
+% VARIABLES FROM SNICAR
+
+heat_rt; % radiative heating rate in K/hr
+heat_day = heat_rt.*24; % heating over day
+heat_timestep = heat_day * 3; % heating over timestep (1 timestep = 3 days)
+heat_timestep = heat_timestep.';
+new_T = initial_T + heat_timestep;
+
+% CONSTANTS
+
+CICE = 2.11727e3; % Specific heat capacity of ice J/kg/K
+CWAT = 4.188e3; % Specific heat capacity of water J/kg/K
+Lf = 3.337e5; % Latent heat of fusion J/kg
+
+
+%%%%%%%%%%%%%%%%%%%%%%% CALCULATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 for i = 1:1:nbr_lyr   % iterate through each vertical layer
-    % assign input values
+           
+    if i <= nbr_lyr-1
+        temp_grad(i) = (new_T(i) - new_T(i+1)) / dz(i);
+    else
+        temp_grad(i) = 0;
+    end
+    
     density = rho_snw(i);
     r0 = r0;
     r = rds_snw(i);
-    temp = T(i);
-    TG = temp_grad;
+    TG = temp_grad(i);
     doubling_time = doubling_time; % required to convert timestep into days
     fliq = fliqs(i); % assign liquid water fraction
     f_ref = f_refs(i);
-    r_new = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq,f_ref); % function call from grain_size_evolution.m
+    r_new = grain_size_evolution(new_T(i),TG,density,r0,r,doubling_time,fliq,f_ref); % function call from grain_size_evolution.m
     new_r(i) = r_new; % append new radius into array
     
-        if T(i) >= 273.15  % if layer temp is greater than freezing point, initiate melting code to update liquid water fraction per layer...
+        if new_T(i) >= 273.15  % if layer temp is greater than freezing point, initiate melting code to update liquid water fraction per layer...
             
-            T_excess(i) = T(i) - 273.15; % calculate residual T that could be used for melting          
-            mass_ice(i) = dz(i) * rho_snw(i); % mass of ice = layer thickness * density
-            mass_wat(i) = ((mass_ice(i)/917)*1000) * fliqs(i); % mass of water = (mass of ice converted to mass of water, multiplied by liquid water fraction)
-            c(i) = (mass_wat(i) / dz(i) * CWAT) +  (mass_ice(i) / dz(i) * CICE); % c is the volumetric ice/water heat capacity (J m-3 K-1)
+            T_excess(i) = new_T(i) - 273.15; % calculate residual T that could be used for melting          
+            c(i) = (w_mass(i) / dz(i) * CWAT) +  (i_mass(i) / dz(i) * CICE); % c is the volumetric ice/water heat capacity (J m-3 K-1)
             E_excess(i) = T_excess(i) * c(i); % excess energy (J/m3) = excess heat (K)* volumetric specific heat capacity of ice/water mix (J/m3/K) (OVER TIMESTEP)
             W_change(i) = E_excess(i) / Lf; % change in ice mass = excess energy / energy required to melt ice (latent heat of fusion)
-            new_w_mass(i) = mass_wat(i) + W_change(i); % updated water mass = old + change
+            new_w_mass(i) = w_mass(i) + W_change(i); % updated water mass = old + change
             new_i_mass(i) = i_mass(i) - W_change(i); % ice converted to water, so subtract change in water mass from initial ice mass
             new_fliqs(i) = new_w_mass(i) / new_i_mass(i); % new liquid water fraction
-            
+            new_T(i+1) = new_T(i+1) + T_excess(i);
             % using this scheme assumes all excess energy is dissipated in
             % phase change ice -> water. Amount of excess energy determines
             % mass of water produced
         end
 end
+
 
 % The following loop percolates new liquid water down through the snowpack.
 % Regardless of the layer the water forms in, it will immediately percolate
@@ -287,23 +279,30 @@ for i = 1:1:nbr_lyr
     if new_fliqs(i) < 0
         new_fliqs(i) = 0; % if new < old, it can't have -ve water, so reset to zero.
     end
-    if new_fliqs(i) > 0 && T(i) < 273.15
+    
+    if new_fliqs(i) > 0 && new_T(i) < 273.15
         new_f_refs(i) = f_refs(i) + new_fliqs(i);
         new_fliqs(i) = 0;
     end
     
-    if f_ref + fliq >= 1
-        check = "LIQUID & REFROZEN FRACTIONS EXCEED 1: CHANGE!!!" % Alert user if liquid/refrozen fractions too high
+    new_i_mass(i) = i_mass(i) * (1 + new_f_refs(i)) * (1 - new_fliqs(i)); % calculate mass (kg) of each layer (inc those below freezing) after percolation) 
+    
+    new_dz(i) = new_i_mass(i) / rho_snw(i); % update layer thickness (kg / kg m-1 = m)
+    
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% CHECKS AND BALANCES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    if new_dz(i) < 0.001
+        new_dz(i) = 0.001; % layer thickness can't be less than 1 mm.
     end
     
-    if new_fliqs(i) > 0
-        ADD_WATER = "LAYER " + num2str(i) + " melting: add liquid water film" % Alert user to add water film b/c ice is melting
+    if new_T(i) > 273.15
+        new_T(i) = 273.15; % reset max temps to freezing point
     end
     
-    new_i_mass(i) = i_mass(i) * (1 + new_f_refs(i)) * (1 - new_fliqs(i)); % calculate mass of each layer (inc those below freezing) after percolation) 
-    
-    new_dz(i) = new_i_mass(i) /rho_snw(i); % update layer thickness
-        
 end
 
 
@@ -312,16 +311,24 @@ end
 % is the weighted average of the new radius and the refrozen grains
 % (weighted by new_f_refs)
 
-overall_new_r = ((new_r.*(100-new_f_refs)) + (new_f_refs.*1500)) / 100 ;
+overall_new_r = ((new_r.*(100-new_fliqs)) + (new_f_refs.*1500)) / 100 ;
 
 
-% Finally, ensure that the layer thickness cannot drop below a certain
-% threshold. If this treshold is reached, the layer  is merged with the one
-% below
+% Some temporary re-assignments - for large grains the resolution coarsens
+% because mie params are available for fewer Reffs. Alternatively, create
+% netcdfs for grains at 1micron resolution in wkdir
 
-
-new_fliqs
-
+for i = 1:1:nbr_lyr
+    if (overall_new_r(i) > 1500) && (overall_new_r(i) <= 1750)
+        overall_new_r(i) = 1500;
+    elseif (overall_new_r(i) > 1750) && (overall_new_r(i) <=2000)
+        overall_new_r(i) = 2000;
+    elseif (overall_new_r(i) > 2000) && (overall_new_r(i) <=2500)
+        overall_new_r(i) = 2000;
+    elseif overall_new_r(i) > 2500
+        overall_new_r(i) = 3000;
+    end
+end
 
 end
 

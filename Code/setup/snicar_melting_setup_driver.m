@@ -38,7 +38,7 @@ rho_snw_init = [100, 200, 200, 300, 300];
 rds_snw_init = [100, 100, 150, 200, 250];
 rds_coated_init = ["0","0","0","0","0"];
 x_init = 0.01e6;
-initial_T = [260, 260, 255, 250, 260];
+initial_T = [270, 268, 267, 265, 260];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
 wat_coat_init = [0,0,0,0,0];
@@ -250,7 +250,7 @@ dz_init = dz_new;
 % Create labelled table for each output variable
 
 T_table = array2table(T_list,'VariableNames',{'T_top','T_z2','T_z3','T_z4','T_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
-x_table = array2table(x_list,'VariableNames',{'x'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'})
+x_table = array2table(x_list,'VariableNames',{'x'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 f_ref_table = array2table(f_refs_list,'VariableNames',{'f_ref_top','f_ref_z2','f_ref_z3','f_ref_z4','f_ref_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 fliqs_table = array2table(fliqs_list,'VariableNames',{'fliqs_top','fliqs_z2','fliqs_z3','fliqs_z4','fliqs_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 rds_table = array2table(rds_list,'VariableNames',{'r_top','r_z2','r_z3','r_z4','r_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
