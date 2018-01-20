@@ -294,14 +294,6 @@ for i = 1:1:nbr_lyr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%% CHECKS AND BALANCES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-    if new_dz(i) < 0.001
-        new_dz(i) = 0.001; % layer thickness can't be less than 1 mm.
-    end
-    
-    if new_T(i) > 273.15
-        new_T(i) = 273.15; % reset max temps to freezing point
-    end
     
 end
 
@@ -327,6 +319,15 @@ for i = 1:1:nbr_lyr
         overall_new_r(i) = 2000;
     elseif overall_new_r(i) > 2500
         overall_new_r(i) = 3000;
+    end
+
+
+    if new_dz(i) < overall_new_r(i)*10e-6
+        new_dz(i) = overall_new_r(i) * 10e-6; % layer thickness can't be less than grain diameter (2*r).
+    end
+    
+    if new_T(i) > 273.15
+        new_T(i) = 273.15; % reset max temps to freezing point
     end
 end
 

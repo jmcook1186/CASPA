@@ -38,17 +38,10 @@ rho_snw_init = [100, 200, 200, 300, 300];
 rds_snw_init = [100, 100, 150, 200, 250];
 rds_coated_init = ["0","0","0","0","0"];
 x_init = 0.01e6;
-initial_T = [270, 268, 267, 265, 260];
+initial_T = [270, 269, 268, 267, 266];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
 wat_coat_init = [0,0,0,0,0];
-
-% Set up empty variables to append results to
-
-% x_list = zeros(1,1);
-% f_refs_list = zeros(1,1);
-% T_list = zeros(1,length(f_refs_init));
-% rds_list = zeros(1,length(rds_snw_init));
 
 
 x_list(1,1) = 0;
