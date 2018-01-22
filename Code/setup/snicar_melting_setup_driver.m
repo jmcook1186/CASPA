@@ -38,7 +38,7 @@ rho_snw_init = [100, 200, 200, 300, 300];
 rds_snw_init = [100, 100, 150, 200, 250];
 rds_coated_init = ["0","0","0","0","0"];
 x_init = 0.01e6;
-initial_T = [270, 269, 268, 267, 266];
+initial_T = [273, 273, 272, 272, 272];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
 wat_coat_init = [0,0,0,0,0];
@@ -181,7 +181,7 @@ Initial_T = new_T;
 f_refs_init = new_f_refs;
 fliqs_init = new_fliqs;
 rds_snw_init = round(overall_new_r);
-
+dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 8 %%%%%%%%%%
 
@@ -252,7 +252,7 @@ dz_table = array2table(dz_list,'VariableNames',{'dz_top','dz_z2','dz_z3','dz_z4'
 %concatenate tables into one large output table (currently only relevant
 %variables for creating snicar instances (x, rds, water coat thickness)
 
-output_table = [x_table,dz_table,rds_table,wat_coat_table]
+output_table = [x_table,T_table,dz_table,rds_table,wat_coat_table]
 
 
 % Write table to csv
