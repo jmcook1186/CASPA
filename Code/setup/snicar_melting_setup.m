@@ -288,14 +288,33 @@ for i = 1:1:nbr_lyr
     new_i_mass(i) = i_mass(i) * (1 + new_f_refs(i)) * (1 - new_fliqs(i)); % calculate mass (kg) of each layer (inc those below freezing) after percolation) 
     
     new_dz(i) = new_i_mass(i) / rho_snw(i); % update layer thickness (kg / kg m-1 = m)
-    
+
+end
     
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%% CHECKS AND BALANCES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    
-end
+
+
+
+
+
+
+%%%% IDEA FOR DENSIFICATION INSTEAD OF THICKENING: APPLY WHERE LAYERS
+%%%% ACCRUE MASS??  %%%%%%%%%%
+
+
+new_dz(end) = 0.05;
+rho_snw(end) = new_i_mass(end)/0.05;
+
+
+
+
+
+
+
+
 
 
 % the layer must be described using one representative effective radius.
