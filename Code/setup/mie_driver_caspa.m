@@ -115,6 +115,7 @@ ice_frac_vol = 100 - water_frac_vol;
 
 part_dens = ((IceDensity*ice_frac_mss/100)+(WatDensity*water_frac_mss/100)); % density of particle as average weighted by mass of components
 
+
 %%%%%%%%%%%%%%%%%%%%% CREATE AND POPULATE NETCDF  %%%%%%%%%%%%%%%%%%
 
 % Copy existing netcdf to ensure formatting is consistent
@@ -138,11 +139,11 @@ ncwrite(filename,'abs_cff_vlm',AbsXCvol) % volume absorption cross section
 ncwrite(filename,'ss_alb',ssa) % single scattering albedo
 ncwrite(filename,'asm_prm',asymmetry) % assymetry parameter
 
-ncwrite(filename,'rds_swa',1.00001) % surface weighted radius (analytic)
-ncwrite(filename,'rds_swr',1.00001) % surface weighted radius (resolved)
-ncwrite(filename,'rds_nma',1020e-6) % analytic number-mean radius
-ncwrite(filename,'gsd',5e-6) % geometric SD of lognormal distribution
-ncwrite(filename,'prt_dns',937) % particle density
+ncwrite(filename,'rds_swa',rr) % surface weighted radius (analytic)
+ncwrite(filename,'rds_swr',rr) % surface weighted radius (resolved)
+ncwrite(filename,'rds_nma',) % analytic number-median radius
+ncwrite(filename,'gsd',1.5) % geometric SD of lognormal distribution
+ncwrite(filename,'prt_dns',part_dens) % particle density
 
 end
 
