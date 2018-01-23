@@ -33,12 +33,12 @@ R_sfc = 0.15;
 
 % variables
 
-dz_init = [0.05,0.05,0.05,0.05,0.05];
+dz_init = [0.02,0.05,0.05,0.05,0.05];
 rho_snw_init = [100, 200, 200, 300, 300];
-rds_snw_init = [100, 100, 150, 200, 250];
+rds_snw_init = [200, 200, 350, 400, 450];
 rds_coated_init = ["0","0","0","0","0"];
 x_init = 0.01e6;
-initial_T = [273, 273, 272, 272, 272];
+initial_T = [273, 270, 265, 260, 260];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
 wat_coat_init = [0,0,0,0,0];
@@ -254,7 +254,16 @@ dz_table = array2table(dz_list,'VariableNames',{'dz_top','dz_z2','dz_z3','dz_z4'
 
 output_table = [x_table,T_table,dz_table,rds_table,wat_coat_table]
 
-
 % Write table to csv
 
 %writetable(output_table,'CASPA_SNICAR_Inputs.csv','WriteRowNames',true) 
+
+
+% Uncomment this code to run the mie solver and add the netcdf files for 
+% the relevant new grain sizes and water coatings to the working directory
+
+for i = 1:1:length(rds_list)
+    rad = rds_list(i);
+    wat_rad = wat_coat_thickness(i);
+    mie_driver_caspa(rad,wat_rad)   
+end
