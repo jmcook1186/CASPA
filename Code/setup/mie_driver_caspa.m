@@ -1,10 +1,25 @@
 % Driver for miecoated.m, originally written by Christian matzler (see
 % Matzler, 2002).
+% 
 % inputs are:
 %   rice : radius of inner ice sphere
 %   rwater : radius of outer water sphere (from centre of ice sphere to
 %           edge of water sphere)
-%   
+% 
+% This script was written to interface with the caspa setup scripts such
+% that the variables rad and wat_rad are pulled in from
+% snicar_melting_setup.m which creates snicar inout variables for a melting
+% snowpack driven by a grain size evolution code and an algal growth model.
+% The resulting grain sizes and water coating thickness are parsed to this
+% script which generates the relevant optical properties for the grains and
+% water coatings generated and adds them to the working directory to be
+% called from snicar during a CASPA run.
+
+% For this reason, the run this script independently of CASPA, the
+% variables rad and wat_rad are the inputs which are then aliased to rice
+% and water for the call to mie_coated.m
+
+
 % Outputs: 
 %   miecoated.m returns the following efficiency factors: [qext qsca qabs qb asy qratio]
 %   the driver convolves these with the particle dimensions to return the
@@ -20,6 +35,9 @@
 % Also note that the code includes an interpolation regime. This is because
 % the original code produced NaNs for a few wavelengths at certain size
 % parameters, particularly in the mid NIR wavelengths.
+
+% The code automatically saves new netcdfs files and adds them to the
+% working directory
 
 
 % Written by Joseph Cook, Feb 2018, University of Sheffield, UK
@@ -93,7 +111,49 @@ asymmetry= fillmissing(asymmetry,'spline')
 q_ratio= fillmissing(q_ratio,'spline')
 ssa= fillmissing(ssa,'spline')
 
+% Instability exists for long wavelengths and large grain sizes.
+% Experimentation showed this could occur for coated grains > 1300 microns.
+% The following loop protects against unrealistic values at those long
+% wavelengths by interpolating from the rest of the data for the final 70
+% wavelengths (i.e. from 4.3 - 5 um)
+
+if rwater > 1300
+    
+    iWL = WL(1:400);
+    iextinction = extinction(1:400);
+    i_extinction = interp1(iWL,iextinction,[4.3:0.01:5],'linear','extrap');
+    extinction(400:470) = iextinction(400:end)
+    plot(extinction)
+
+    iscattering = scattering(1:400);
+    i_scattering = interp1(iWL,iscattering,[4.3:0.01:5],'linear','extrap');
+    scattering(400:470) = iscattering(400:end)
+    figure
+    plot(scattering)
+    
+    iabsorption = absorption(1:400);
+    i_absorption = interp1(iWL,iabsorption,[4.3:0.01:5],'linear','extrap');
+    absorption(400:470) = iabsorption(400:end)
+    figure
+    plot(absorption)
+    
+    iSSA = ssa(1:400);
+    i_SSA = interp1(iWL,iSSA,[4.3:0.01:5],'linear','extrap');
+    ssa(400:470) = iSSA(400:end)
+    figure
+    plot(ssa)
+    
+    iASM = asymmetry(1:400);
+    i_ASM = interp1(iWL,iASM,[4.3:0.01:5],'linear','extrap');
+    asymmetry(400:470) = iASM(400:end)
+    figure
+    plot(asymmetry)
+    
+end
+
+
 % calculate cross sections from efficiency factors
+
 ExtXC = (extinction .* TotalXS);
 ScaXC = (scattering .* TotalXS);
 AbsXC = (absorption .* TotalXS);
@@ -139,9 +199,13 @@ ncwrite(filename,'abs_cff_vlm',AbsXCvol) % volume absorption cross section
 ncwrite(filename,'ss_alb',ssa) % single scattering albedo
 ncwrite(filename,'asm_prm',asymmetry) % assymetry parameter
 
-ncwrite(filename,'rds_swa',rr) % surface weighted radius (analytic)
-ncwrite(filename,'rds_swr',rr) % surface weighted radius (resolved)
-ncwrite(filename,'rds_nma',) % analytic number-median radius
+% PSD variables are assigned but are not used by SNICAR (only uses Reff)
+% This is a legacy thing from the original SNICAR code that included some
+% PSD diagnostics. Particle density is calculated and assigned. 
+
+ncwrite(filename,'rds_swa',rad*10e-6 + wat_rad*10e-6) % surface weighted radius (analytic)
+ncwrite(filename,'rds_swr',rad*10e-6 + wat_rad*10e-6) % surface weighted radius (resolved)
+ncwrite(filename,'rds_nma',1e-4) % analytic number-median radius
 ncwrite(filename,'gsd',1.5) % geometric SD of lognormal distribution
 ncwrite(filename,'prt_dns',part_dens) % particle density
 
