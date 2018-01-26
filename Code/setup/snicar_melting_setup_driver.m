@@ -254,16 +254,61 @@ dz_table = array2table(dz_list,'VariableNames',{'dz_top','dz_z2','dz_z3','dz_z4'
 
 output_table = [x_table,T_table,dz_table,rds_table,wat_coat_table]
 
-% Write table to csv
 
+
+% Write table to csv
 %writetable(output_table,'CASPA_SNICAR_Inputs.csv','WriteRowNames',true) 
 
 
-% Uncomment this code to run the mie solver and add the netcdf files for 
+% Uncomment the following loop to run the mie solver and add the netcdf files for 
 % the relevant new grain sizes and water coatings to the working directory
 
-for i = 1:1:length(rds_list)
+
+for i = 1:1:numel(rds_list)
+    
     rad = rds_list(i);
-    wat_rad = wat_coat_thickness(i);
-    mie_driver_caspa(rad,wat_rad)   
+    wat_rad = round(wat_coat_thickness(i));
+    
+    % set path
+    
+    folder_path = '/media/joe/9446-2970/FromGardner/snicar_package/';
+    a = num2str(rad); % rad and wat_rad to strings for filename
+    b = num2str(wat_rad);
+ 
+    % if fewer than 4 digits in rad or wat_rad, pad with zeros
+    
+    if numel(a) < 4
+        a = strcatsprintf('%04d',a);
+    end
+    
+    if numel(b) < 4
+        b = sprintf( '%04d', b ) ;
+    end
+    
+    
+    % if water coating required, add 'coated' into filename
+    if wat_rad > 0
+    
+        filename = strcat('ice_wrn_coated_',a, '_',b,'.nc');
+        fullpath = strcat(folder_path,filename);
+    else
+        filename = strcat('ice_wrn_',a,'.nc');
+        fullpath = strcat(folder_path,filename);
+    end
+    
+    % check to see if file is already in the working directory, if it is
+    % just raise a flag and do not run the mie solver. If the file does not
+    % already exist, run the mie solver and add file to wdir
+    
+    if exist(fullpath,'file')
+        
+        A = strcat('NetCDF for ', filename, 'already exists')
+    
+    else
+        
+        mie_driver_caspa(rad,wat_rad)
+    
+    end
+    
+    
 end
