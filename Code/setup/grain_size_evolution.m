@@ -26,16 +26,8 @@
 % load file and set variables (later will be pulled from snicar)
 function [r_new] = grain_size_evolution(temp,TG,density,r0,r,doubling_time,fliq,f_ref)
 
-load('drdt_bst_fit_60.mat');
+load('drdt_bst_fit_60.mat'); % load empirical coefficients (Flanner and Zender 2006)
 
-temp = temp;% temperature in K
-TG = TG; % temp gradient
-density = density; % snow density in kgm-3
-r0 = r0;
-r = r; % ice crystal diameter in microns
-doubling_time = doubling_time;
-fliq = fliq;
-f_ref = f_ref; % fraction of refrozen ice, assumed reff = 1500 um
 C = 4.22e-13; % constant (Flanner and Zender 2006)
 
 % find index of closest match for each variable in database
@@ -52,9 +44,8 @@ drdt0_v = drdt0(idx_T,idx_dTdz,idx_sno_dns);
 
 dry_aging = (drdt0_v*(tau_v/((r-r0)+tau_v))^(1/kappa_v));
 wet_aging = (10e18 * C * fliq^3) / (4* pi * r^2);
-refrozen = 1500 * f_ref;
 
-dr_dtime = dry_aging + wet_aging + f_ref; % rate of change in microns/hr
+dr_dtime = dry_aging + wet_aging; % rate of change in microns/hr
 
 dr_day = dr_dtime * 24; %change over one day
 dr_timestep = dr_day * doubling_time; % change over timestep

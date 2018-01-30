@@ -33,12 +33,12 @@ R_sfc = 0.15;
 
 % variables
 
-dz_init = [0.02,0.05,0.05,0.05,0.05];
-rho_snw_init = [100, 200, 200, 300, 300];
-rds_snw_init = [200, 200, 350, 400, 450];
+dz_init = [0.05,0.05,0.05,0.05,0.05];
+rho_snw_init = [100, 100, 200, 200, 300];
+rds_snw_init = [200, 200, 200, 200, 250];
 rds_coated_init = ["0","0","0","0","0"];
 x_init = 0.01e6;
-initial_T = [273, 270, 265, 260, 260];
+initial_T = [273, 273, 273, 272, 270];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
 wat_coat_init = [0,0,0,0,0];
@@ -53,187 +53,187 @@ wat_coat_thickness(1,[1:length(wat_coat_init)]) = wat_coat_init;
 dz_list(1,[1:length(dz_init)]) = dz_init;
 
 %%%%%%% BEGIN RUN 1 %%%%%%%%%%%%%
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 
 % add new variable values to lists. Each run is a separate row, each snow layer
 % is a separate column
 x_list(2,1) = x_init;
 T_list(2,[1:length(new_T)]) = new_T;
-f_refs_list(2,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(2,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(2,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(2,[1:length(fliqs_init)]) = fliqs;
 rds_list(2,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(2,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(2,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(2,[1:length(dz_init)]) = dz_init;
 
 % update outputs for next run
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%% BEGIN RUN 2  %%%%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 
 
 x_list(3,1) = x_init;
 T_list(3,[1:length(new_T)]) = new_T;
-f_refs_list(3,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(3,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(3,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(3,[1:length(fliqs_init)]) = fliqs;
 rds_list(3,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(3,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(3,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(3,[1:length(dz_init)]) = dz_init;
 
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 x_init = x_init*2;
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 3 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(4,1) = x_init;
 T_list(4,[1:length(new_T)]) = new_T;
-f_refs_list(4,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(4,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(4,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(4,[1:length(fliqs_init)]) = fliqs;
 rds_list(4,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(4,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(4,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(4,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 4 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(5,1) = x_init;
 T_list(5,[1:length(new_T)]) = new_T;
-f_refs_list(5,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(5,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(5,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(5,[1:length(fliqs_init)]) = fliqs;
 rds_list(5,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(5,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(5,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(5,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 5 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(6,1) = x_init;
 T_list(6,[1:length(new_T)]) = new_T;
-f_refs_list(6,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(6,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(6,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(6,[1:length(fliqs_init)]) = fliqs;
 rds_list(6,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(6,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(6,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(6,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 6 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(7,1) = x_init;
 T_list(7,[1:length(new_T)]) = new_T;
-f_refs_list(7,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(7,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(7,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(7,[1:length(fliqs_init)]) = fliqs;
 rds_list(7,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(7,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(7,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(7,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 7 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(8,1) = x_init;
 T_list(8,[1:length(new_T)]) = new_T;
-f_refs_list(8,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(8,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(8,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(8,[1:length(fliqs_init)]) = fliqs;
 rds_list(8,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(8,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(8,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(8,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 8 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(9,1) = x_init;
 T_list(9,[1:length(new_T)]) = new_T;
-f_refs_list(9,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(9,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(9,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(9,[1:length(fliqs_init)]) = fliqs;
 rds_list(9,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(9,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(9,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(9,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 9 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(10,1) = x_init;
 T_list(10,[1:length(new_T)]) = new_T;
-f_refs_list(10,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(10,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(10,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(10,[1:length(fliqs_init)]) = fliqs;
 rds_list(10,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(10,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(10,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(10,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
 %%%%%%%% BEGIN RUN 10 %%%%%%%%%%
 
-[overall_new_r, new_f_refs, new_T, new_fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
+[overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
 x_list(11,1) = x_init;
 T_list(11,[1:length(new_T)]) = new_T;
-f_refs_list(11,[1:length(f_refs_init)]) = new_f_refs;
-fliqs_list(11,[1:length(fliqs_init)]) = new_fliqs;
+f_refs_list(11,[1:length(f_refs_init)]) = f_refs;
+fliqs_list(11,[1:length(fliqs_init)]) = fliqs;
 rds_list(11,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(11,[1:length(wat_coat_init)]) = overall_new_r .* new_fliqs;
+wat_coat_thickness(11,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(11,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
 Initial_T = new_T;
-f_refs_init = new_f_refs;
-fliqs_init = new_fliqs;
+f_refs_init = f_refs;
+fliqs_init = fliqs;
 rds_snw_init = round(overall_new_r);
 dz_init = dz_new;
 
@@ -260,8 +260,11 @@ output_table = [x_table,T_table,dz_table,rds_table,wat_coat_table]
 %writetable(output_table,'CASPA_SNICAR_Inputs.csv','WriteRowNames',true) 
 
 
-% Uncomment the following loop to run the mie solver and add the netcdf files for 
-% the relevant new grain sizes and water coatings to the working directory
+% Uncomment the call to mie_driver_caspa in the following loop to run the
+% mie solver and add the netcdf files for the relevant new grain sizes 
+% and water coatings to the working directory. Pads with zeros if the no of
+% digits is <4, meaning the filenaming convention is consistent with the
+% SNICAR driver in matlab and FORTRAN and also CLM.
 
 
 for i = 1:1:numel(rds_list)
@@ -278,7 +281,7 @@ for i = 1:1:numel(rds_list)
     % if fewer than 4 digits in rad or wat_rad, pad with zeros
     
     if numel(a) < 4
-        a = strcatsprintf('%04d',a);
+        a = sprintf('%04d',a);
     end
     
     if numel(b) < 4
@@ -302,11 +305,11 @@ for i = 1:1:numel(rds_list)
     
     if exist(fullpath,'file')
         
-        A = strcat('NetCDF for ', filename, 'already exists')
+        A = strcat('NetCDF for ', filename, ' already exists');
     
     else
         
-        mie_driver_caspa(rad,wat_rad)
+        A = 'doing mie'; % mie_driver_caspa(rad,wat_rad);
     
     end
     
