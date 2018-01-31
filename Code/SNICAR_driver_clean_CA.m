@@ -57,7 +57,7 @@ function [alb_slr,albedo_clean] = SNICAR_CA()
 % RADIATIVE TRANSFER CONFIGURATION:
 BND_TYP  = 1;        % 1= 470 spectral bands
 DIRECT   = 1;        % 1= Direct-beam incident flux, 0= Diffuse incident flux
-APRX_TYP = 3;        % 1= Eddington, 2= Quadrature, 3= Hemispheric Mean
+APRX_TYP = 1;        % 1= Eddington, 2= Quadrature, 3= Hemispheric Mean
 DELTA    = 1;        % 1= Apply Delta approximation, 0= No delta
 
 % COSINE OF SOLAR ZENITH ANGLE FOR DIRECT-BEAM
@@ -67,20 +67,20 @@ coszen   = 0.5;
 %   Value is applied to all wavelengths.
 %   User can also specify spectrally-dependent ground albedo
 %   internally in snicar8d.m
-R_sfc    = 0.25;
+R_sfc    = 0.15;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
-dz       = [0.01 0.1 0.01 0.1 10];
+dz       = [0.05 0.05 0.05 0.05 0.05];
  
 nbr_lyr  = length(dz);  % number of snow layers
 
 % SNOW DENSITY OF EACH LAYER (units: kg/m3)
-rho_snw(1:nbr_lyr) = [914,914,914,914,914];  
+rho_snw(1:nbr_lyr) = [200,200,200,200,250];  
 
 
 % SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
-rds_snw(1:nbr_lyr) = [1000,2000,2000,2000,2000];
+rds_snw(1:nbr_lyr) = [200,200,200,250,250];
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()

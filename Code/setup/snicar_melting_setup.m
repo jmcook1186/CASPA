@@ -254,6 +254,7 @@ for i = 1:1:nbr_lyr
     if fliqs(i) > 0 && new_T(i) < 273.15   % if there is water and the temp < freezing
         
         f_refs(i) = f_refs(i) + fliqs(i); % add liquid water fraction to refrozen fraction    
+        
         fliqs(i) = 0; % remove liquid water from layer (it has moved to refrozen layer)
         
     end
@@ -268,7 +269,7 @@ for i = 1:1:nbr_lyr
         
     dz(i) = i_mass(i) / rho_snw(i); % update layer thickness (kg / kg m-1 = m)
     
-    % Ensure layer does not grow vertically whe it accrues mass - update
+    % Ensure layer does not grow vertically when it accrues mass - update
     % density instead
     
     if dz(i) > 0.05    
@@ -320,7 +321,7 @@ for i = 1:1:nbr_lyr
     
 end
 
-i_mass
+
 
 end
 

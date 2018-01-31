@@ -8,7 +8,7 @@
 % 
 % This script was written to interface with the caspa setup scripts such
 % that the variables rad and wat_rad are pulled in from
-% snicar_melting_setup.m which creates snicar inout variables for a melting
+% snicar_melting_setup.m which creates snicar input variables for a melting
 % snowpack driven by a grain size evolution code and an algal growth model.
 % The resulting grain sizes and water coating thickness are parsed to this
 % script which generates the relevant optical properties for the grains and
@@ -21,10 +21,10 @@
 
 
 % Outputs: 
-%   miecoated.m returns the following efficiency factors: [qext qsca qabs qb asy qratio]
-%   the driver convolves these with the particle dimensions to return the
-%   cross sections for extinction, scattering and absorption plus the
-%   asymmetry parameter, q ratio and single scattering albedo.
+% miecoated.m returns the following efficiency factors: [qext qsca qabs qb asy qratio]
+% the driver convolves these with the particle dimensions to return the
+% cross sections for extinction, scattering and absorption plus the
+% asymmetry parameter, q ratio and single scattering albedo.
 %
 % Note that the call to miecoated.m includes a term 'opt', which can be set
 % to the values 1,2 or 3. These are alternative methods for calculating the

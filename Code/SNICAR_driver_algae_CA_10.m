@@ -1,63 +1,10 @@
-% Driver routine for SNICAR.  Also see commenting in snicar8d.m
-
-%%%%%%%%%%  Input parameters: %%%%%%%%%%%
-% BND_TYP:      Spectral grid (=1 for 470 bands. This is the
-%               only functional option in this distribution)
-% DIRECT:       Direct or diffuse incident radiation (1=direct, 0=diffuse)
-% APRX_TYP:     Two-Stream Approximation Type:
-%                  1 = Eddington
-%                  2 = Quadrature
-%                  3 = Hemispheric Mean
-%                  NOTE: Delta-Eddington Approximation is probably
-%                  best for the visible spectrum, but can provide
-%                  negative albedo in the near-IR under diffuse
-%                  light conditions. Hence, the Hemispheric Mean
-%                  approximation is recommended for general use.
-% DELTA:        1=Use Delta approximation (Joseph, 1976), 0=don't use
-% coszen:       cosine of solar zenith angle (only applies when DIRECT=1)
-% R_sfc:        broadband albedo of underlying surface 
-%                  (user can also define a spectrally-dependent albedo below)
-% dz:           array of snow layer thicknesses [meters]. Top layer has index 1. 
-%                  The length of this array defines number of snow layers
-% rho_snw:      array of snow layer densities [kg m-3]. Must have same length as dz
-% rds_snw:      array of snow layer effective grain radii [microns]. Must have same length as dz
-% nbr_aer:      number of aerosol species in snowpack
-% mss_cnc_sot1: mass mixing ratio of black carbon species 1 (uncoated BC)
-%                 (units of parts per billion, ng g-1)
-% mss_cnc_sot2: mass mixing ratio of black carbon species 2 (sulfate-coated BC)
-%                 (units of parts per billion, ng g-1)
-% mss_cnc_dst1: mass mixing ratio of dust species 1 (radii of 0.05-0.5um)
-%                 (units of parts per billion, ng g-1)
-% mss_cnc_dst2: mass mixing ratio of dust species 2 (radii of 0.5-1.25um)
-%                 (units of parts per billion, ng g-1)
-% mss_cnc_dst3: mass mixing ratio of dust species 3 (radii of 1.25-2.5um)
-%                 (units of parts per billion, ng g-1)
-% mss_cnc_dst4: mass mixing ratio of dust species 4 (radii of 2.5-5.0um)
-%                 (units of parts per billion, ng g-1)
-% mss_cnc_ash1: mass mixing ratio of volcanic ash species 1
-%                 (units of parts per billion, ng g-1)
-% mss_cnc_bio1: mass mixing ratio of biological impurity species 1
-%                  (units of parts per billion, ng g-1)
-% mss_cnc_water1: mass mixing ratio of water type 1
-%                  (units of parts per billion, ng g-1)
-% fl_sot1:      name of file containing optical properties for BC species 1
-% fl_sot2:      name of file containing optical properties for BC species 2
-% fl_dst1:      name of file containing optical properties for dust species 1
-% fl_dst2:      name of file containing optical properties for dust species 2
-% fl_dst3:      name of file containing optical properties for dust species 3
-% fl_dst4:      name of file containing optical properties for dust species 4
-% fl_ash1:      name of file containing optical properties for ash species 1
-% fl_bio1:      name of file containing optical properties for bio species 1
-% fl_water1:    name of file containing optical properties for water type 1
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 function [alb_slr,albedo_clean] = SNICAR_CA()
 
 % RADIATIVE TRANSFER CONFIGURATION:
 BND_TYP  = 1;        % 1= 470 spectral bands
 DIRECT   = 1;        % 1= Direct-beam incident flux, 0= Diffuse incident flux
-APRX_TYP = 3;        % 1= Eddington, 2= Quadrature, 3= Hemispheric Mean
+APRX_TYP = 1;        % 1= Eddington, 2= Quadrature, 3= Hemispheric Mean
 DELTA    = 1;        % 1= Apply Delta approximation, 0= No delta
 
 % COSINE OF SOLAR ZENITH ANGLE FOR DIRECT-BEAM
@@ -67,24 +14,24 @@ coszen   = 0.5;
 %   Value is applied to all wavelengths.
 %   User can also specify spectrally-dependent ground albedo
 %   internally in snicar8d.m
-R_sfc    = 0.25;
+R_sfc    = 0.15;
 
 
 % SNOW LAYER THICKNESSES (array) (units: meters):
-dz       = [0.01 0.1 0.01 0.1 10];
+dz       = [0.029 0.0494 0.05 0.05 0.05];
  
 nbr_lyr  = length(dz);  % number of snow layers
 
 % SNOW DENSITY OF EACH LAYER (units: kg/m3)
-rho_snw(1:nbr_lyr) = [914,914,914,914,914];  
+rho_snw(1:nbr_lyr) = [200,200,200,200,250];  
 
 
 % SNOW EFFECTIVE GRAIN SIZE FOR EACH LAYER (units: microns):
-rds_snw(1:nbr_lyr) = [1000,2000,2000,2000,2000];
+rds_snw(1:nbr_lyr) = [0,0,809,845,1379];
 
 % IF COATED GRAINS USED, SET rds_snw() to ZEROS and use rds_coated()
 % IF UNCOATED GRAINS USED, SET rds_coated to ZEROS and use rds_snw()
-rds_coated(1:nbr_lyr) = [0,0,0,0,0];
+rds_coated(1:nbr_lyr) = ["1041_10","504_5","0","0","0"];
 
 % NUMBER OF AEROSOL SPECIES IN SNOW (ICE EXCLUDED)
 %  Species numbers (used in snicar8d.m) are:
@@ -106,7 +53,7 @@ rds_coated(1:nbr_lyr) = [0,0,0,0,0];
 
 nbr_aer = 15;
 
-    for x = 1.28e6   % for reference: 1e6 = 1ug/g (1000000 ppb or 1000 ppm)
+    for x = 5.12e6   % for reference: 1e6 = 1ug/g (1000000 ppb or 1000 ppm)
 
     % PARTICLE MASS MIXING RATIOS (units: ng(species)/g(ice), or ppb)
     mss_cnc_sot1(1:nbr_lyr)  = [0,0,0,0,0];  % uncoated black carbon

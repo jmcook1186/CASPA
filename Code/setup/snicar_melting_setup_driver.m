@@ -38,7 +38,7 @@ rho_snw_init = [100, 100, 200, 200, 300];
 rds_snw_init = [200, 200, 200, 200, 250];
 rds_coated_init = ["0","0","0","0","0"];
 x_init = 0.01e6;
-initial_T = [273, 273, 273, 272, 270];
+initial_T = [273, 272.75, 272.5, 272, 270];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
 wat_coat_init = [0,0,0,0,0];
@@ -254,11 +254,14 @@ dz_table = array2table(dz_list,'VariableNames',{'dz_top','dz_z2','dz_z3','dz_z4'
 
 output_table = [x_table,T_table,dz_table,rds_table,wat_coat_table]
 
+snicar_params = [BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc];
+snicar_params_table = array2table(snicar_params,'VariableNames',{'BND_TYP','DIRECT','APRX_TYP','DELTA','coszen','R_sfc'})
 
 
-% Write table to csv
+% Write tables to csv
+
 %writetable(output_table,'CASPA_SNICAR_Inputs.csv','WriteRowNames',true) 
-
+%writetable[snicar_params_table,'CASPA,SNICAR_params.csv']
 
 % Uncomment the call to mie_driver_caspa in the following loop to run the
 % mie solver and add the netcdf files for the relevant new grain sizes 
@@ -294,24 +297,32 @@ for i = 1:1:numel(rds_list)
     
         filename = strcat('ice_wrn_coated_',a, '_',b,'.nc');
         fullpath = strcat(folder_path,filename);
-    else
-        filename = strcat('ice_wrn_',a,'.nc');
-        fullpath = strcat(folder_path,filename);
-    end
-    
+   
     % check to see if file is already in the working directory, if it is
     % just raise a flag and do not run the mie solver. If the file does not
     % already exist, run the mie solver and add file to wdir
-    
-    if exist(fullpath,'file')
+           
+        if exist(fullpath,'file')
         
-        A = strcat('NetCDF for ', filename, ' already exists');
+            A = strcat('NetCDF for ', filename, ' already exists');
     
-    else
+        else
+            
+            %mie_driver_caspa(rad,wat_rad);
         
-        A = 'doing mie'; % mie_driver_caspa(rad,wat_rad);
-    
+        end
+        
     end
     
+          
     
+
+    
+  
+    
+        
 end
+
+    
+    
+    
