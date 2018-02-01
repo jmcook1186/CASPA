@@ -41,7 +41,6 @@ x_init = 0.01e6;
 initial_T = [273, 272.75, 272.5, 272, 270];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
-wat_coat_init = [0,0,0,0,0];
 
 
 x_list(1,1) = 0;
@@ -49,7 +48,6 @@ T_list(1,[1:length(initial_T)]) = initial_T;
 f_refs_list(1,[1:length(f_refs_init)]) = f_refs_init;
 fliqs_list(1,[1:length(fliqs_init)]) = fliqs_init;
 rds_list(1,[1:length(rds_snw_init)]) = rds_snw_init;
-wat_coat_thickness(1,[1:length(wat_coat_init)]) = wat_coat_init;
 dz_list(1,[1:length(dz_init)]) = dz_init;
 
 %%%%%%% BEGIN RUN 1 %%%%%%%%%%%%%
@@ -62,7 +60,6 @@ T_list(2,[1:length(new_T)]) = new_T;
 f_refs_list(2,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(2,[1:length(fliqs_init)]) = fliqs;
 rds_list(2,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(2,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(2,[1:length(dz_init)]) = dz_init;
 
 % update outputs for next run
@@ -83,7 +80,6 @@ T_list(3,[1:length(new_T)]) = new_T;
 f_refs_list(3,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(3,[1:length(fliqs_init)]) = fliqs;
 rds_list(3,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(3,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(3,[1:length(dz_init)]) = dz_init;
 
 Initial_T = new_T;
@@ -101,7 +97,6 @@ T_list(4,[1:length(new_T)]) = new_T;
 f_refs_list(4,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(4,[1:length(fliqs_init)]) = fliqs;
 rds_list(4,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(4,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(4,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -119,7 +114,6 @@ T_list(5,[1:length(new_T)]) = new_T;
 f_refs_list(5,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(5,[1:length(fliqs_init)]) = fliqs;
 rds_list(5,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(5,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(5,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -137,7 +131,6 @@ T_list(6,[1:length(new_T)]) = new_T;
 f_refs_list(6,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(6,[1:length(fliqs_init)]) = fliqs;
 rds_list(6,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(6,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(6,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -155,7 +148,6 @@ T_list(7,[1:length(new_T)]) = new_T;
 f_refs_list(7,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(7,[1:length(fliqs_init)]) = fliqs;
 rds_list(7,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(7,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(7,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -173,7 +165,6 @@ T_list(8,[1:length(new_T)]) = new_T;
 f_refs_list(8,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(8,[1:length(fliqs_init)]) = fliqs;
 rds_list(8,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(8,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(8,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -191,7 +182,6 @@ T_list(9,[1:length(new_T)]) = new_T;
 f_refs_list(9,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(9,[1:length(fliqs_init)]) = fliqs;
 rds_list(9,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(9,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(9,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -209,7 +199,6 @@ T_list(10,[1:length(new_T)]) = new_T;
 f_refs_list(10,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(10,[1:length(fliqs_init)]) = fliqs;
 rds_list(10,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(10,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(10,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -227,7 +216,6 @@ T_list(11,[1:length(new_T)]) = new_T;
 f_refs_list(11,[1:length(f_refs_init)]) = f_refs;
 fliqs_list(11,[1:length(fliqs_init)]) = fliqs;
 rds_list(11,[1:length(rds_snw_init)]) = round(overall_new_r);
-wat_coat_thickness(11,[1:length(wat_coat_init)]) = overall_new_r .* fliqs;
 dz_list(11,[1:length(dz_init)]) = dz_init;
 
 x_init = x_init*2;
@@ -247,12 +235,11 @@ x_table = array2table(x_list,'VariableNames',{'x'},'RowNames',{'SNICAR_INIT','SN
 f_ref_table = array2table(f_refs_list,'VariableNames',{'f_ref_top','f_ref_z2','f_ref_z3','f_ref_z4','f_ref_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 fliqs_table = array2table(fliqs_list,'VariableNames',{'fliqs_top','fliqs_z2','fliqs_z3','fliqs_z4','fliqs_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 rds_table = array2table(rds_list,'VariableNames',{'r_top','r_z2','r_z3','r_z4','r_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
-wat_coat_table = array2table(wat_coat_thickness,'VariableNames',{'w_coat_top','wat_coat_z2','wat_coat_z3','wat_coat_z4','wat_coat_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 dz_table = array2table(dz_list,'VariableNames',{'dz_top','dz_z2','dz_z3','dz_z4','dz_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
 %concatenate tables into one large output table (currently only relevant
 %variables for creating snicar instances (x, rds, water coat thickness)
 
-output_table = [x_table,T_table,dz_table,rds_table,wat_coat_table]
+output_table = [x_table,T_table,dz_table,rds_table]
 
 snicar_params = [BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc];
 snicar_params_table = array2table(snicar_params,'VariableNames',{'BND_TYP','DIRECT','APRX_TYP','DELTA','coszen','R_sfc'})
@@ -273,56 +260,61 @@ snicar_params_table = array2table(snicar_params,'VariableNames',{'BND_TYP','DIRE
 for i = 1:1:numel(rds_list)
     
     rad = rds_list(i);
-    wat_rad = round(wat_coat_thickness(i));
     
     % set path
     
     folder_path = '/media/joe/9446-2970/FromGardner/snicar_package/';
-    a = num2str(rad); % rad and wat_rad to strings for filename
-    b = num2str(wat_rad);
- 
-    % if fewer than 4 digits in rad or wat_rad, pad with zeros
+       
+    a = sprintf('%04s',num2str(rad));
+        
+    % if water coating required, add 'coated' into filename 
     
-    if numel(a) < 4
-        a = sprintf('%04d',a);
-    end
-    
-    if numel(b) < 4
-        b = sprintf( '%04d', b ) ;
-    end
-    
-    
-    % if water coating required, add 'coated' into filename
-    if wat_rad > 0
-    
-        filename = strcat('ice_wrn_coated_',a, '_',b,'.nc');
-        fullpath = strcat(folder_path,filename);
+    filename = strcat('ice_wrn_',a,'.nc');
+    fullpath = strcat(folder_path,filename);
    
     % check to see if file is already in the working directory, if it is
     % just raise a flag and do not run the mie solver. If the file does not
     % already exist, run the mie solver and add file to wdir
            
-        if exist(fullpath,'file')
+    if exist(fullpath,'file')
         
-            A = strcat('NetCDF for ', filename, ' already exists');
+        A = strcat('NetCDF for ', filename, ' already exists');
     
-        else
-            
-            %mie_driver_caspa(rad,wat_rad);
+    else
         
-        end
+        A = sprintf('doing mie calc for %s',filename)
+        mie_driver_caspa(rad);
         
     end
-    
-          
-    
-
-    
-  
-    
         
 end
 
+
+% Run SNICAR with input values from the setup code above. The
+% 'output_table' from the setup code provides the inout values for each
+% instance of SNICAR. Two files are saved to the workspace: spectral_list
+% and BBA. Each column of 'spectral_list.mat' contains the spectral albedo
+% of the snow for each SNICAR instance (1-11). The file 'BBA.mat' contains
+% the broadband albedo calculated by SNICAR for each instance. These can
+% then be read by CASPA instead of running SNICAR each time. No manual
+% inputting of values into SNICAR is required using this method = major
+% time saving and avoids human errors.
+          
+spectral_list = zeros(470,length(x_list));
+
+for i = 1:1:length(x_list)
+    dz = dz_list(i,:);
+    rho_snw = rho_snw_init;
+    rds_snw = rds_list(i,:);
+    x = x_list(i,:);
     
+    [BBalb,spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x);
     
-    
+    BBA(i) = BBalb;
+    spectral_list(:,i) = spectral;
+
+end
+
+save('spectral_list.mat','spectral_list');
+save('BBA.mat','BBA');
+

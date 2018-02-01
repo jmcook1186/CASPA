@@ -265,6 +265,12 @@ for i = 1:1:nbr_lyr
     
     end 
     
+    % Since RI of water and ice are v similar, we assume water coatings can
+    % be modelled as additional ice grain radius. Therefore, we add the
+    % liquid water fraction to the ice grain radius
+    
+    new_r(i) = new_r(i) + (new_r(i)*fliqs(i));
+    
     % Update layer thickness according to mass
         
     dz(i) = i_mass(i) / rho_snw(i); % update layer thickness (kg / kg m-1 = m)
@@ -291,6 +297,7 @@ end
 % Since we assume refrozen water to have reff = 1500um, the overall radius
 % is the weighted average of the new radius and the refrozen grains
 % (weighted by new_f_refs)
+
 
 weight_r = 1-f_refs;
 
