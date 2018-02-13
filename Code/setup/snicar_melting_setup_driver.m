@@ -317,4 +317,5 @@ end
 
 save('spectral_list.mat','spectral_list');
 save('BBA.mat','BBA');
+save('Biomass.mat','x_list')
 

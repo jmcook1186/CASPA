@@ -71,11 +71,13 @@
     % Currently assumes constant irradiance throughout timestep (no night
     % time)
 
-clear;
 
-% open a figure for plotting the final albedo grid
-figure(1);
-figure(2);
+
+
+% open figures for plotting the final albedo grid
+figure(1)
+figure(2)
+figure(3)
 
 % set up empty lists
 
@@ -85,6 +87,7 @@ IRF_spectral = [];
 IRF_sum = [];
 Tot_Biomass_list =[]'
 Tot_alg_pixels_list = [];
+Tot_alg_pixels_percent_list = [];
 
 %%% USER DEFINED VARIABLES: SET HERE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -365,6 +368,9 @@ Biomass = load('Biomass.mat');
         coverage5+coverage6+coverage7+coverage8+coverage9+coverage10;
     Tot_alg_pixels_list(counter) = Tot_alg_pixels;
     
+    Tot_alg_pixels_percent = (Tot_alg_pixels / gridsize)*100;
+    Tot_alg_pixels_percent_list(counter) = Tot_alg_pixels_percent;
+    
     Tot_Biomass = Biomass1 + Biomass2 + Biomass3 + Biomass4 + Biomass5...
         +Biomass6 + Biomass7 + Biomass8 + Biomass9 + Biomass10;
     Tot_Biomass_list(counter) = Tot_Biomass;
@@ -418,3 +424,4 @@ end
     yyaxis left
     plot(x_time,Tot_alg_pixels_list,'color','r')
     ylabel('Algal Coverage (no. cells)')
+    
