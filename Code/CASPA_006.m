@@ -73,7 +73,6 @@
 
 
 
-
 % open figures for plotting the final albedo grid
 figure(1)
 figure(2)
@@ -85,7 +84,6 @@ BBAlist = []; % list to append mean grid value to for albedo grid
 spectral_average = [];
 IRF_spectral = [];
 IRF_sum = [];
-Tot_Biomass_list =[]'
 Tot_alg_pixels_list = [];
 Tot_alg_pixels_percent_list = [];
 
@@ -106,6 +104,7 @@ timestep = 1;
 gridsize = 40000; % total grid area (no. cells)
 gridx = 200; % length of x-axis
 gridy= 200; % length of y-axis
+length_scale = 0.1; % define length of each pixel in metres
 alg_frac = 0.5; % percentage of algal coverage at start of experiment (all initialise as light algae: class 1)
 non_alg_frac = gridsize-alg_frac; % residual = non-algal, assumed clean
 doubling_time = 3; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
@@ -225,8 +224,9 @@ grid2 = grid; % copy surface class grid for populating with albedos
 
 SPEC = load('spectral_list.mat');
 BBA = load('BBA.mat');
-Biomass = load('Biomass.mat');
-      
+X = load('X_list.mat');
+dz = load('dz.mat');
+biomass = [];
 %%% Loop through grid and replace surface class with albedo from SNICAR lookup
 % library populated in loop above.
         
@@ -326,9 +326,10 @@ Biomass = load('Biomass.mat');
     cbar.Label.String = 'Albedo';
     caxis([0,0.7]);
     drawnow
-    %saveas(figure,sprintf('FIG%d.png'));
     
+    %saveas(figure(1),sprintf('FIG_%d.jpg',counter));
     
+
     % Calculate total coverage (no of cells containing non-zero biomass)
     % and total biomass (coverage per surface class * biomass per surface
     % class) per timestep.
@@ -338,45 +339,55 @@ Biomass = load('Biomass.mat');
     % initial setup will automatically feed through to here.
     
     coverage0 = sum(sum(grid==0));
-    Biomass0 = 0;
     coverage1 = sum(sum(grid==1));
-    Biomass1 = coverage1 * Biomass.x_list(1);
     coverage2 = sum(sum(grid==2));
-    Biomass2 = coverage2 * Biomass.x_list(2);
     coverage3 = sum(sum(grid==3));
-    Biomass3 = coverage3 * Biomass.x_list(3);
     coverage4 = sum(sum(grid==4));
-    Biomass4 = coverage4 * Biomass.x_list(4);
     coverage5 = sum(sum(grid==5));
-    Biomass5 = coverage5 * Biomass.x_list(5);
     coverage6 = sum(sum(grid==6));
-    Biomass6 = coverage6 * Biomass.x_list(6);
     coverage7 = sum(sum(grid==7));
-    Biomass7 = coverage7 * Biomass.x_list(7);
     coverage8 = sum(sum(grid==8));
-    Biomass8 = coverage8 * Biomass.x_list(8);
     coverage9 = sum(sum(grid==9));
-    Biomass9 = coverage9 * Biomass.x_list(9);
     coverage10 = sum(sum(grid==10));
-    Biomass10 = coverage10 * Biomass.x_list(10);
+
+    % Calculate biomass in grams over the grid. This calculates volume of
+    % snow in top layer where impurities are present (length^2 * depth),
+    % multiplies that by the density = mass of snow. The mixing ratio is
+    % grams algae per gram of snow, so multiply mixing ratio by mass to
+    % find mass of impurity. This varies for each surface type, so multiply
+    % byy coverage and sum to give total biomass for entire grid.
     
-    
-    % REQUIRES MORE THOUGHT ABOUT HOW TO GO FROM MIXING RATIO TO BIOMASS
-    % PER AREA
-    
+    Biomass0 = coverage0 * dz.dz_list(1,1)*length_scale^2 * rho_snw(1) * X.x_list(1);
+    Biomass1 = coverage1 * dz.dz_list(2,1)*length_scale^2 * rho_snw(1) * X.x_list(2);
+    Biomass2 = coverage2 * dz.dz_list(3,1)*length_scale^2 * rho_snw(1) * X.x_list(3);
+    Biomass3 = coverage3 * dz.dz_list(4,1)*length_scale^2 * rho_snw(1) * X.x_list(4);
+    Biomass4 = coverage4 * dz.dz_list(5,1)*length_scale^2 * rho_snw(1) * X.x_list(5);
+    Biomass5 = coverage5 * dz.dz_list(6,1)*length_scale^2 * rho_snw(1) * X.x_list(6);
+    Biomass6 = coverage6 * dz.dz_list(7,1)*length_scale^2 * rho_snw(1) * X.x_list(7);
+    Biomass7 = coverage7 * dz.dz_list(8,1)*length_scale^2 * rho_snw(1) * X.x_list(8);
+    Biomass8 = coverage8 * dz.dz_list(9,1)*length_scale^2 * rho_snw(1) * X.x_list(9);
+    Biomass9 = coverage9 * dz.dz_list(10,1)*length_scale^2 * rho_snw(1) * X.x_list(10);
+    Biomass10 = coverage10 * dz.dz_list(11,1)*length_scale^2 * rho_snw(1) * X.x_list(11);
+                
+    % Calculate % coverage (binary yes or no per cell)
     Tot_alg_pixels = coverage1+coverage2+coverage3+coverage4+...
         coverage5+coverage6+coverage7+coverage8+coverage9+coverage10;
     Tot_alg_pixels_list(counter) = Tot_alg_pixels;
     
+    % Percent of grid with non-zero biomass
     Tot_alg_pixels_percent = (Tot_alg_pixels / gridsize)*100;
     Tot_alg_pixels_percent_list(counter) = Tot_alg_pixels_percent;
     
-    Tot_Biomass = Biomass1 + Biomass2 + Biomass3 + Biomass4 + Biomass5...
-        +Biomass6 + Biomass7 + Biomass8 + Biomass9 + Biomass10;
-    Tot_Biomass_list(counter) = Tot_Biomass;
+    % Total biomass in grid per timestep
+    Tot_biomass(counter) = Biomass0 + Biomass1 + Biomass2 + Biomass3 + Biomass4 + Biomass5...
+        + Biomass6 + Biomass7 + Biomass8 + Biomass9 + Biomass10
+    
+    % Total biomass in grid per square meter 
+    Tot_biomass_per_m(counter) = Tot_biomass(counter) / gridsize*length_scale;
     
 end
-    
+
+
     %%% IRF calculations integrated over wavelength and time
     
     % NOTE that the IRF here is measured per second by default. This is
@@ -406,7 +417,6 @@ end
     x_time = [1:1:time_tot].*doubling_time; % set up real time in days for plotting
     
     figure(2)
-    hold on
     yyaxis right
     plot(x_time,IRF_BBA,'color','r')
     ylabel('IRF (W/grid)')
@@ -417,11 +427,19 @@ end
     legend('Broadband Albedo','IRF (W/grid)')
     
     figure(3)
-    hold on
     yyaxis right
-    plot(x_time,Tot_Biomass_list,'color','b')
+    plot(x_time,Tot_biomass,'color','r')
     ylabel('Biomass, ng algae g snow')
     yyaxis left
-    plot(x_time,Tot_alg_pixels_list,'color','r')
+    plot(x_time,Tot_alg_pixels_list,'color','b')
     ylabel('Algal Coverage (no. cells)')
     
+    figure(4)
+    yyaxis right
+    plot(x_time,BBAlist)
+    ylabel('Albedo')
+    yyaxis left
+    plot(x_time,Tot_biomass)
+    ylabel('Biomass (g)')
+
+ 
