@@ -2,41 +2,53 @@
 
 README written and maintained by J Cook, University of Sheffield
 
-Initial commits contain 4 versions of CASPA code previously held locally by J Cook. These four versions were produced before version control migrated to Github, so updates are marked in comments in scripts.
-
-The code is written in Matlab and is designed to provide a framework for modelling snow albedo using radiative transfer by invoking the BioSNICAR model (Cook et al., 2017) which was an adapted form of Mark Flanner's original SNICAR model enabling the incorporation of biological impurities. Here, a cellular automaton is developed that uses BioSNICAR to calculate the albedo of a snowpack in each cell in a grid i x j, and evolves the snowpack according to biological growth rules dervied from empirical experiments and existing literature. 
+The code is written in Matlab and is designed to model snow albedo using radiative transfer by invoking the BioSNICAR model (Cook et al., 2017) in a cellular automaton framework. BioSNICAR is used to calculate the albedo of a snowpack in each cell in a grid i x j. At each timestep the algal biomass is updated according to a user defined doubling time and a grain size evolution model adapoted from the Community Land Model and Flanner and Zender(2006) is used to update the snow grain sizes and layer thicknesses, driven by energy fluxes predicted by te radiative transfer model.
 
 This code is in active development and is not yet published. There are no permissions granted for copying, applying or using this code.
 
 
 # OVERVIEW
 
-This model simulates a snow surface with physical/optical properties
+This model simulates a snow surface with initial physical/optical properties
 defined by the user. This surface is represented as a cellular automaton,
 i.e. an x,y grid composed of discrete cells that update based upon certain
 functions as the model advances through time.
-There are various modes of operation. The simplest is to simulate an
-algal bloom that grows from an initial configuration defined by the user.
-The user defines the % coverage at t=0. At each timestep, algal growth is
-simulated using a probabalistic function, where growth in situ has a
-given likelihood, spread of the algae into neighbouring cells has a given
-likelihood, and spontaneous initiation of a new bloom has a give
-likelihood. Growth is represented by increasing the cell value - i.e. 0
-represents clean ice, 1-10 represent increasing mixing ratio of algae in
-the upper surface. A carrying capacity is simulated wherein the cell
-value cannot exceed a value of 10. Once the cell value reaches 10 the
-bloom can only grow by spreading. If all the neighbouring cells are also
-at carrying capacity, the algae will not grow.
+
+The model simulates an algal bloom that grows from an initial configuration
+defined by the user. The user defines the % coverage at t=0. At each timestep,
+algal growth is simulated using a probabalistic function, where growth in situ
+has a given likelihood and spread of the algae into neighbouring cells
+(Moore neighbourhood) has a given likelihood. Growth is represented by 
+increasing the cell value - i.e. 0 represents clean ice, 1-10 represent 
+increasing mixing ratio of algae in the upper surface. A carrying capacity 
+is simulated wherein the cell value cannot exceed a value of 10. Once the 
+cell value reaches 10 the bloom can only grow by spreading. If all the 
+neighbouring cells are also at carrying capacity, the algae will not grow.
 
 At each timestep, the grid is thereby updated. The value of each cell is
 associated with a call to a specific instance of the radiative transfer
-scheme BioSNICAR. These instances are pre-coded as driver routines
-saved in the working directory. In this default version, each instance is
-identical except for the mixing ratio of algae in the upper 3mm of ice.
-The broadband and spectral albedo of each pixel in the grid is thereby 
-modelled using BioSNICAR and a spatially-integrated albedo computed 
-using a grid-mean. The albedo is used to calculate the radiative forcing
-following Ganey et al (2017: Nat Geoscience) and Dial et al (2018: FEMS)
+scheme BioSNICAR. BioSNICAR is run offline coupled to a grain size evolution
+model that uses the energy fluxes in each vertical layer of the snowpack
+predicted by BiOSNICAR. The grain size evolution model accounts for wet and 
+dry grain growth and accumulation of liquid water. Liquid water is 
+generated whenever there is excess energy that raises the snow temperature
+abive 273.15K. This water can pecolate into lower layers. If the lower layers
+have sub-freezing temperatures the water will refreeze. refrozen water is
+assumed to have a radius of 1500 microns. Liquid water that remains in situ
+is modelled by increasing the optical radius of the ice grains. The optical
+properties of the snow is therbey updated for each instance of BioSNICAR and
+the broadband and spectal albedo are returned for each surface class. These
+are added to a lookup table accessible by CASPA as it updates the cellular
+model each timestep. Running CASPA with the grain evolution model ON and OFF 
+and differencing the twp outputs provides a measure of direct and indirect 
+effects of algae on albedo and radiative forcing.
+
+A spatially-integrated spectral and broadband albedo for the entire grid is 
+computed using a 2D-mean. Biomass is calculated from the volume, density and 
+mixing ratio of impurities in the upper snow layer.
+
+The spectral albedo and spetcral irradiance is used to calculate the radiative
+forcing following Ganey et al (2017: Nat Geoscience) and Dial et al (2018: FEMS)
 by multipling the incoming irradiance by 1-albedo for clean and 'mixed'
 surfaces, the difference between which provides the RF caused by
 impurities.
@@ -46,18 +58,31 @@ have 2x algal biomass in upper layer, meaning 1 timestep is equal to the
 doubling time of the algae, making the time dimension tractable. For a
 doubling time of 3 days, one timestep = 3 days. Albedo change / doubling
 time (days) = albedo change per day.
-Also, in the default version the algal growth is uninterupted, so left
-long enough the algae will have even coverage at carrying capacity.
-However, there is the option to interrupt the growth, simulating a
-rainfall event for example. Could potentially simulate nutrient
-limitation by increasin or decreasing the doubling times for the blooms.
-A nutrient nutrient pulse could thereby be simulated.
 
-Possibility to model indirect effects: could increase grain size along
-with algal biomass, according to field observations (measured biomass vs
-depth of 1030nm absorption feature). 
+
+# RUNNING THE MODEL
+
+Running the model in default mode is simple because the processing is highly
+automated. The CASPA repository should be cloned or downloaded and all files
+saved to the working directory. 
+
+Then, there are just two scripts to run. First, run snicar_melting_setup.m. 
+This will populate the workspace with all relevant datasets. Then run the
+most recent version of CASPA (CASPA_006.m at time of writing README).
+The script will produce plots of the snow surface showing the growing algal 
+blooms, albedo and IRF against time, biomass and coverae against time, and
+biomass and albedo against time.
+
+To tweak the inputs, user-defined variables can be found all together near 
+the start of the script. For more in-depth changes, such as SNICAR conditions,
+bio-optical parameters etc, refer to the main documentation provided in this
+repository.
+
+
 
 # Model Development Prior to Initial Commit to Github
+These notes detail the state of the code prior to the first upload to GitHub,
+for reference.
 
 ## CASPA v 0.01
 
@@ -98,20 +123,3 @@ addition to albedo. This is achieved by differencing the spectral albedo of the
 simulated snowpack and a hypothetical clean snowpack then multiplying
 1 - albedo by incoming spectral irradiance and normalising in space/time. There were
 also some minor changes to variable names etc. to imporve the readability.
-
-# TODOS
-       
-1. Deal with edge effects (-1s and +1s can push the indexing out of grid
-range, currently counter starts at 2 and ends at i,j -1, but this
-leads to a border that doesn't update)
-       
-2. Could add an additional randi() dice roll to randomly reduce value
-of cells, simulating rainfall washaway. Alternatively, a sudden dust
-deposition event...? These don't have to be random, they could start
-on a particular ticker value (e.g. at 20th timestep: rain).
-        
-3. Can the initial grid be set using UAV por satellite imagery?
-    
-4. How should I deal with dust? constant background value? 
-
-5. Incorporation of snow grain evolution parameterisation from Flanner and Zender?
