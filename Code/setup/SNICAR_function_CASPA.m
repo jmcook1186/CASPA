@@ -2,7 +2,8 @@
 function [alb_slr,albedo_spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x)
 
 nbr_lyr  = length(dz);  % number of snow layers
-nbr_aer = 15;
+nbr_aer = 16;
+
 
 % PARTICLE MASS MIXING RATIOS (units: ng(species)/g(ice), or ppb)
 mss_cnc_sot1(1:nbr_lyr)  = [0,0,0,0,0];  % uncoated black carbon

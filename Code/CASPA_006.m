@@ -70,10 +70,9 @@
     % 4. Need to reduce IRF etc due to day/night irradiance changes?
     % Currently assumes constant irradiance throughout timestep (no night
     % time)
-
-
-
+    
 % open figures for plotting the final albedo grid
+
 figure(1)
 figure(2)
 figure(3)
@@ -263,7 +262,7 @@ biomass = [];
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%% IRF CALCULATION %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    SPEC.spectral_list(:,2)
+
     
     A = sum(grid(:)==0) * SPEC.spectral_list(:,1); %sum of zeros in grid (weight) * spectral albedo
     B = sum(grid(:)==1) * SPEC.spectral_list(:,2);
@@ -353,21 +352,20 @@ biomass = [];
     % Calculate biomass in grams over the grid. This calculates volume of
     % snow in top layer where impurities are present (length^2 * depth),
     % multiplies that by the density = mass of snow. The mixing ratio is
-    % grams algae per gram of snow, so multiply mixing ratio by mass to
-    % find mass of impurity. This varies for each surface type, so multiply
-    % byy coverage and sum to give total biomass for entire grid.
+    % grams algae per gram of snow, so multiply mixing ratio by mass of snow
+    % to find mass of impurity. This varies for each surface type, so 
+    % multiply by coverage and sum to give total biomass for entire grid.
     
-    Biomass0 = coverage0 * dz.dz_list(1,1)*length_scale^2 * rho_snw(1) * X.x_list(1);
-    Biomass1 = coverage1 * dz.dz_list(2,1)*length_scale^2 * rho_snw(1) * X.x_list(2);
-    Biomass2 = coverage2 * dz.dz_list(3,1)*length_scale^2 * rho_snw(1) * X.x_list(3);
-    Biomass3 = coverage3 * dz.dz_list(4,1)*length_scale^2 * rho_snw(1) * X.x_list(4);
-    Biomass4 = coverage4 * dz.dz_list(5,1)*length_scale^2 * rho_snw(1) * X.x_list(5);
-    Biomass5 = coverage5 * dz.dz_list(6,1)*length_scale^2 * rho_snw(1) * X.x_list(6);
-    Biomass6 = coverage6 * dz.dz_list(7,1)*length_scale^2 * rho_snw(1) * X.x_list(7);
-    Biomass7 = coverage7 * dz.dz_list(8,1)*length_scale^2 * rho_snw(1) * X.x_list(8);
-    Biomass8 = coverage8 * dz.dz_list(9,1)*length_scale^2 * rho_snw(1) * X.x_list(9);
-    Biomass9 = coverage9 * dz.dz_list(10,1)*length_scale^2 * rho_snw(1) * X.x_list(10);
-    Biomass10 = coverage10 * dz.dz_list(11,1)*length_scale^2 * rho_snw(1) * X.x_list(11);
+    Biomass1 = (coverage1/gridsize*100) * dz.dz_list(2,1)*length_scale^2 * rho_snw(1) * X.x_list(2);
+    Biomass2 = (coverage2/gridsize*100) * dz.dz_list(3,1)*length_scale^2 * rho_snw(1) * X.x_list(3);
+    Biomass3 = (coverage3/gridsize*100) * dz.dz_list(4,1)*length_scale^2 * rho_snw(1) * X.x_list(4);
+    Biomass4 = (coverage4/gridsize*100) * dz.dz_list(5,1)*length_scale^2 * rho_snw(1) * X.x_list(5);
+    Biomass5 = (coverage5/gridsize*100) * dz.dz_list(6,1)*length_scale^2 * rho_snw(1) * X.x_list(6);
+    Biomass6 = (coverage6/gridsize*100) * dz.dz_list(7,1)*length_scale^2 * rho_snw(1) * X.x_list(7);
+    Biomass7 = (coverage7/gridsize*100) * dz.dz_list(8,1)*length_scale^2 * rho_snw(1) * X.x_list(8);
+    Biomass8 = (coverage8/gridsize*100) * dz.dz_list(9,1)*length_scale^2 * rho_snw(1) * X.x_list(9);
+    Biomass9 = (coverage9/gridsize*100) * dz.dz_list(10,1)*length_scale^2 * rho_snw(1) * X.x_list(10);
+    Biomass10 = (coverage10/gridsize*100) * dz.dz_list(11,1)*length_scale^2 * rho_snw(1) * X.x_list(11);
                 
     % Calculate % coverage (binary yes or no per cell)
     Tot_alg_pixels = coverage1+coverage2+coverage3+coverage4+...
@@ -379,11 +377,11 @@ biomass = [];
     Tot_alg_pixels_percent_list(counter) = Tot_alg_pixels_percent;
     
     % Total biomass in grid per timestep
-    Tot_biomass(counter) = Biomass0 + Biomass1 + Biomass2 + Biomass3 + Biomass4 + Biomass5...
-        + Biomass6 + Biomass7 + Biomass8 + Biomass9 + Biomass10
+    Tot_biomass(counter) = Biomass1 + Biomass2 + Biomass3 + Biomass4 + Biomass5...
+        + Biomass6 + Biomass7 + Biomass8 + Biomass9 + Biomass10;
     
     % Total biomass in grid per square meter 
-    Tot_biomass_per_m(counter) = Tot_biomass(counter) / gridsize*length_scale;
+    Tot_biomass_per_m(counter) = Tot_biomass(counter) / gridsize*length_scale^2;
     
 end
 
@@ -429,7 +427,7 @@ end
     figure(3)
     yyaxis right
     plot(x_time,Tot_biomass,'color','r')
-    ylabel('Biomass, ng algae g snow')
+    ylabel('Biomass, g')
     yyaxis left
     plot(x_time,Tot_alg_pixels_list,'color','b')
     ylabel('Algal Coverage (no. cells)')
@@ -441,5 +439,4 @@ end
     yyaxis left
     plot(x_time,Tot_biomass)
     ylabel('Biomass (g)')
-
- 
+    
