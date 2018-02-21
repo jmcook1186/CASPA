@@ -14,15 +14,16 @@ mss_cnc_dst3(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 3
 mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
 mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
 mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
-mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2
+mss_cnc_bio2(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 2
 mss_cnc_bio3(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 3
 mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
-mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
+mss_cnc_bio5(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 5
 mss_cnc_bio6(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
 mss_cnc_bio7(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
 mss_cnc_water1(1:nbr_lyr) = [0,0,0,0,0];   % Water, 2 mm spheres
 mss_cnc_hematite(1:nbr_lyr) = [0,0,0,0,0];   % Water, 2 mm spheres
 mss_cnc_mixed_sand(1:nbr_lyr) = [0,0,0,0,0];
+
 
 % FILE NAMES CONTAINING MIE PARAMETERS FOR ALL AEROSOL SPECIES:
 fl_sot1  = 'mie_sot_ChC90_dns_1317.nc';
@@ -67,7 +68,6 @@ flx_nir_abs(1) = data_in(8,4); % top layer NIR absorption
 alb_slr;
 albedo_spectral = albedo;
 
-
-   
+  
 end
     

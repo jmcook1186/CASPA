@@ -18,9 +18,7 @@
 % fraction in each layer (using a weighted mean, assuming refrozen water
 % has an effective radius of 1500 microns).
 
-function[] = CASPA_setup(GRAIN_SIZE, BND_TYP,DIRECT,APRX_TYP,DELTA,...
-coszen,R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init,...
-x_init, initial_T, fliqs_init, f_refs_init)
+function[] = CASPA_setup(GRAIN_SIZE, BND_TYP,DIRECT,APRX_TYP,DELTA, coszen,R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init,folder_path)
 
 % append initial conditions to 1st line of output table
 x_list(1,1) = 0;
@@ -55,7 +53,6 @@ if GRAIN_SIZE==1
     %%%%%%% BEGIN RUN 2  %%%%%%%%%%%%
 
     [overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, initial_T, fliqs_init, f_refs_init);
-
 
     x_list(3,1) = x_init;
     T_list(3,[1:length(new_T)]) = new_T;
@@ -245,12 +242,10 @@ if GRAIN_SIZE==1
 
         % set path
 
-        folder_path = '/media/joe/9446-2970/FromGardner/snicar_package/';
-
         a = sprintf('%04s',num2str(rad));
 
         % if water coating required, add 'coated' into filename 
-
+        
         filename = strcat('ice_wrn_',a,'.nc');
         fullpath = strcat(folder_path,filename);
 
@@ -282,13 +277,12 @@ if GRAIN_SIZE==1
     % inputting of values into SNICAR is required using this method = major
     % time saving and avoids human errors.
 
-    spectral_list = zeros(470,length(x_list));
 
     for i = 1:1:length(x_list)
         dz = dz_list(i,:);
         rho_snw(i,:) = rho_snw_init;
         rds_snw(i,:) = rds_list(i,:);
-        x = x_list(i,:);
+        x = x_list(i);
 
         [BBalb,spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x);
 
@@ -333,8 +327,6 @@ else
         spectral_list(:,i) = spectral;
     
     end
-
-x_list = x_list(1:11);
 
 end
 

@@ -73,7 +73,7 @@
     
 % open figures for plotting the final albedo grid
 
-function [spectral_average, BBAlist,x_time] = CASPA_007()
+function [spectral_average, BBAlist,x_time,Tot_biomass_per_m] = CASPA_V01(time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, chance_insitu, folder_path)
 
 % set up empty lists
 
@@ -88,24 +88,18 @@ Tot_alg_pixels_percent_list = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %read incoming irradiance file and assign to variable 'incoming'
-fileID = fopen('media/joe/9446-2970/FromGardner/snicar_package/mlw_sfc_flx_frc_clr.txt');
+% fileID = fopen('media/joe/9446-2970/FromGardner/snicar_package/mlw_sfc_flx_frc_clr.txt');
+fileID = fopen(folder_path + 'mlw_sfc_flx_frc_clr.txt');
 incoming=textscan(fileID,'%f','Delimiter',',');
 incoming=cell2mat(incoming); %convert to column vector
 fclose(fileID);
 
-% set up time ticker (time_tot = total no of timesteps in run)
-time_tot = 30;  % 30 timesteps = 90 days if doubling time = 3
-timestep = 1;
 
 % %% Set up grid
-gridsize = 40000; % total grid area (no. cells)
-gridx = 200; % length of x-axis
-gridy= 200; % length of y-axis
-length_scale = 0.1; % define length of each pixel in metres
-alg_frac = 0.5; % percentage of algal coverage at start of experiment (all initialise as light algae: class 1)
+
+gridx = sqrt(gridsize); % length of x-axis
+gridy= sqrt(gridsize); % length of y-axis
 non_alg_frac = gridsize-alg_frac; % residual = non-algal, assumed clean
-doubling_time = 3; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
-chance_insitu = 60; % probability (%) that growth occurs in situ (100 - chance_insitu = chance spreading)
 rho_snw = [300,300,300,300,300];
 
 % turn % coverage into actual number of pixels
@@ -225,6 +219,7 @@ BBA = load('BBA.mat');
 X = load('X_list.mat');
 dz = load('dz.mat');
 biomass = [];
+
 %%% Loop through grid and replace surface class with albedo from SNICAR lookup
 % library populated in loop above.
         
