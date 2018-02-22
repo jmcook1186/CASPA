@@ -313,11 +313,15 @@ for i = 1:1:nbr_lyr
     end
 
 % do not allow layer to be thinner then grain diameter
+% COMMENTED OUT - POSSIBLY DELETE. Effective grain radius (optical) is not
+% equivalent to physical grain radius, so there is no real way to know
+% whether layer is thicker than individual grain.
 
-    if dz(i) < 2* overall_new_r(i)*10e-6
-        FLAG = "R > LAYER"
-        dz(i) = 2 * overall_new_r(i) * 10e-6; % layer thickness can't be less than grain diameter (2*r).
-    end
+
+%     if dz(i) < 2* overall_new_r(i)*10e-6
+%         FLAG = "R > LAYER"
+%         dz(i) = 2 * overall_new_r(i) * 10e-6; % layer thickness can't be less than grain diameter (2*r).
+%     end
     
 % Do not allow temperature to exceed freezing point - this energy has
 % already been dissipated by melting

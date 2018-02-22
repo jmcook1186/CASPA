@@ -37,10 +37,10 @@ chance_insitu = 60; % probability (%) that growth occurs in situ (100 - chance_i
 
 % Initial conditions
 
-x_init = 3000;
+x_init = 5000;
 dz_init = [0.05,0.05,0.05,0.05,0.05];
-rho_snw_init = [250, 250, 250, 250, 350];
-rds_snw_init = [400, 400, 400, 400, 400];
+rho_snw_init = [450, 450, 450, 450, 450];
+rds_snw_init = [100, 100, 100, 100, 100];
 rds_coated_init = ["0","0","0","0","0"];
 initial_T = [273, 273, 272.75, 272, 270];
 fliqs_init = [0,0,0,0,0];
@@ -54,7 +54,7 @@ CASPA_setup(GRAIN_SIZE, BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init
 
 %%%%%%%%%%%%%%%%%% SECTION 2: CASPA RUN  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-num_runs = 10;
+num_runs = 1;
 
 for i = 1:1:num_runs
     

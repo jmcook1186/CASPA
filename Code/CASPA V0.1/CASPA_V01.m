@@ -322,7 +322,7 @@ biomass = [];
     caxis([0,0.7]);
     drawnow
     
-    %saveas(figure(1),sprintf('FIG_%d.jpg',counter));
+    % saveas(figure(1),sprintf('FIG_%d.jpg',counter));
     
 
     % Calculate total coverage (no of cells containing non-zero biomass)
