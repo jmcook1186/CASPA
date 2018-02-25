@@ -62,13 +62,19 @@ time (days) = albedo change per day.
 
 # RUNNING THE MODEL
 
-Running the model in default mode is simple because the processing is highly
-automated. The CASPA repository should be cloned or downloaded and all files
+Running the model in default mode is highly automated and controlled from a
+driver script (CASPA_driver.m).
+
+The CASPA repository should be cloned or downloaded and all files
 saved to the working directory. 
 
-Then, there are just two scripts to run. First, run snicar_melting_setup.m. 
-This will populate the workspace with all relevant datasets. Then run the
-most recent version of CASPA (CASPA_006.m at time of writing README).
+The user-defined variables are assigned in the driver. The grain size evolution
+code cna be turned on or off and the properties of the snowpack defined.
+
+Running the driver first calls the setup functions. This will populate the 
+workspace with all relevant datasets. 
+Then CASPA is called (CASPA_V01.m at time of writing README).
+
 The script will produce plots of the snow surface showing the growing algal 
 blooms, albedo and IRF against time, biomass and coverae against time, and
 biomass and albedo against time.
@@ -77,7 +83,6 @@ To tweak the inputs, user-defined variables can be found all together near
 the start of the script. For more in-depth changes, such as SNICAR conditions,
 bio-optical parameters etc, refer to the main documentation provided in this
 repository.
-
 
 
 # Model Development Prior to Initial Commit to Github
