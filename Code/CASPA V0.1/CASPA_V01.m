@@ -3,14 +3,24 @@
 
 % %% OVERVIEW
 
-% This model simulates a snow surface with initial physical/optical properties
-% defined by the user, then predicted using an algal growth and snow grain evolution
-% model. This surface is represented as a cellular automaton,
-% i.e. an x,y grid composed of discrete cells that update based upon certain
-% functions as the model advances through time.
+% This model simulates the albedo and radiative forcing of a snow surface 
+% over three spatial dimensions plus time. The model is particularly suited
+% to predicting the effects of algal blooms on or under the snow surface
+% but can also be used for purely abiotic snowpack processes such as grain
+% evolution, dust deposition, etc.
 
-% There are various modes of operation. The simplest is to simulate an
-% algal bloom that grows from an initial configuration defined by the user.
+% The initial physical/optical properties of the snowpack are defined
+% by the user. Then the model is run and an algal growth model adds algal
+% cells to the upper layer each timestep. The absorption of solar radiation
+% in each vertical layer is calculated using the SNICAR radiative transfer
+% scheme and used to drive a grain evolution model adapted from that of
+% Flanner and Zender (2006) implemented in CLM. Thi occurs in each cell in
+% a rectangular grid divided into individual cells. Each timestep the
+% biological and physical properties of each cell are updated according to
+% the radiative transfer scheme, the grain evolution model and the algal
+% growth model.
+
+% The algal bloom grows from an initial configuration defined by the user.
 % The user defines the % coverage at t=0. At each timestep, algal growth is
 % simulated using a probabalistic function, where growth in situ has a
 % given likelihood, spread of the algae into neighbouring cells has a given
@@ -53,21 +63,14 @@
 % limitation by increasin or decreasing the doubling times for the blooms.
 % A nutrient nutrient pulse could thereby be simulated.
 
-% Possibility to model indirect effects: could increase grain size along
-% with algal biomass, according to field observations (measured biomass vs
-% depth of 1030nm absorption feature). 
 
 % %% TODOS
-       
-    % 1. Deal with edge effects (-1s and +1s can push the indexing out of grid
-    % range, currently counter starts at 2 and ends at i,j -1, but this
-    % leads to a border that doesn't update) and simply isn't plotted.
         
-    % 2. Can the initial grid be set using UAV or satellite imagery?
+    % 1. Can the initial grid be set using UAV or satellite imagery?
     
-    % 3. How should I deal with dust? constant background? 
+    % 2. How should I deal with dust? constant background? 
     
-    % 4. Need to reduce IRF etc due to day/night irradiance changes?
+    % 3. Need to reduce IRF etc due to day/night irradiance changes?
     % Currently assumes constant irradiance throughout timestep (no night
     % time)
     
@@ -100,7 +103,6 @@ fclose(fileID);
 gridx = sqrt(gridsize); % length of x-axis
 gridy= sqrt(gridsize); % length of y-axis
 non_alg_frac = gridsize-alg_frac; % residual = non-algal, assumed clean
-%rho_snw = [300,300,300,300,300];
 
 % turn % coverage into actual number of pixels
 

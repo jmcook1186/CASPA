@@ -40,7 +40,7 @@ gridsize = 40000; % total grid area (no. cells)
 length_scale = 0.1; % define length of each pixel in metres
 alg_frac = 0.5; % percentage of algal coverage at start of experiment (all initialise as light algae: class 1)
 non_alg_frac = gridsize-alg_frac; % residual = non-algal, assumed clean
-doubling_time = 11; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
+doubling_time = 3; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
 chance_insitu = 60; % probability (%) that growth occurs in situ (100 - chance_insitu = chance spreading)
 
 % Initial conditions
