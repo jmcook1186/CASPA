@@ -58,7 +58,7 @@ nbr_lyr  = length(dz);  % number of snow layers
 %    15: hematite
 %    16: mixed sand (quartz and clay)
 
-nbr_aer = 16;
+nbr_aer = 17;
 
 
 % PARTICLE MASS MIXING RATIOS (units: ng(species)/g(ice), or ppb)
@@ -76,6 +76,7 @@ mss_cnc_bio4(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 4
 mss_cnc_bio5(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 5
 mss_cnc_bio6(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 6
 mss_cnc_bio7(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 7
+mss_cnc_Real_Bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 7
 mss_cnc_hematite(1:nbr_lyr) = [0,0,0,0,0];   % hematite
 mss_cnc_mixed_sand(1:nbr_lyr) = [0,0,0,0,0]; % mixed quartz/clay sand
 
@@ -95,6 +96,7 @@ fl_bio4  = 'biological_4.nc'; % Biological impurity 4 (30um diameter, 1.5%chll a
 fl_bio5  = 'biological_5.nc'; % Biological impurity 5 (10um diameter, pigs as per bio2)
 fl_bio6  = 'biological_6.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2)
 fl_bio7  = 'biological_7.nc'; % Biological impurity 7 (20um diameter, pigs as per bio2)
+fl_Real_Bio1 = 'Real_Bio_1.nc'; % Bio impuroity with measured pig profile inc phenol, 20 micron diam
 fl_hematite  = 'Hematite.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2)
 fl_mixed_sand  = 'mixed_sand.nc'; % Mixed sand (quartz and clays)
 
@@ -102,8 +104,8 @@ fl_mixed_sand  = 'mixed_sand.nc'; % Mixed sand (quartz and clays)
 data_in = snicar8d(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, ...
     dz, rho_snw, rds_snw, rds_coated, nbr_aer, mss_cnc_sot1, ...
     mss_cnc_sot2, mss_cnc_dst1, mss_cnc_dst2, ...
-    mss_cnc_dst3, mss_cnc_dst4, mss_cnc_ash1, mss_cnc_bio1, mss_cnc_bio2,mss_cnc_bio3,mss_cnc_bio4,mss_cnc_bio5, mss_cnc_bio6, mss_cnc_bio7, mss_cnc_hematite, mss_cnc_mixed_sand, fl_sot1, ...
-    fl_sot2, fl_dst1, fl_dst2, fl_dst3, fl_dst4, fl_ash1, fl_bio1,fl_bio2,fl_bio3,fl_bio4,fl_bio5,fl_bio6, fl_bio7, fl_hematite, fl_mixed_sand);
+    mss_cnc_dst3, mss_cnc_dst4, mss_cnc_ash1, mss_cnc_bio1, mss_cnc_bio2,mss_cnc_bio3,mss_cnc_bio4,mss_cnc_bio5, mss_cnc_bio6, mss_cnc_bio7, mss_cnc_Real_Bio1,mss_cnc_hematite, mss_cnc_mixed_sand, fl_sot1, ...
+    fl_sot2, fl_dst1, fl_dst2, fl_dst3, fl_dst4, fl_ash1, fl_bio1,fl_bio2,fl_bio3,fl_bio4,fl_bio5,fl_bio6, fl_bio7, fl_Real_Bio1, fl_hematite, fl_mixed_sand);
 
 
 % process input data:
