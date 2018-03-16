@@ -1,5 +1,5 @@
 
-function [alb_slr,albedo_spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x)
+function [alb_slr,albedo_spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x,y)
 
 nbr_lyr  = length(dz);  % number of snow layers
 nbr_aer = 17;
@@ -11,7 +11,7 @@ mss_cnc_sot2(1:nbr_lyr)  = [0,0,0,0,0];    % coated black carbon
 mss_cnc_dst1(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 1
 mss_cnc_dst2(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 2
 mss_cnc_dst3(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 3
-mss_cnc_dst4(1:nbr_lyr)  = [0,0,0,0,0];    % dust species 4
+mss_cnc_dst4(1:nbr_lyr)  = [y,0,0,0,0];    % dust species 4
 mss_cnc_ash1(1:nbr_lyr)  = [0,0,0,0,0];    % volcanic ash species 1
 mss_cnc_bio1(1:nbr_lyr)  = [0,0,0,0,0];    % Biological impurity species 1
 mss_cnc_bio2(1:nbr_lyr)  = [x,0,0,0,0];    % Biological impurity species 2

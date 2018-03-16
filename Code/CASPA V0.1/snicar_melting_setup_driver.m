@@ -18,21 +18,45 @@
 % fraction in each layer (using a weighted mean, assuming refrozen water
 % has an effective radius of 1500 microns).
 
-function[] = CASPA_setup(GRAIN_SIZE, BND_TYP,DIRECT,APRX_TYP,DELTA, coszen,R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, y_init, scavenging_rate, initial_T, fliqs_init, f_refs_init,folder_path)
+function [] = snicar_melting_setup()
 
-% append initial conditions to 1st line of output table
+clear
+% Set Initial Conditions (at t=0)
+
+% constants
+GRAIN_SIZE = 1;
+BND_TYP = 1;
+DIRECT = 1;
+APRX_TYP = 1;
+DELTA = 1;
+coszen = 0.5;
+R_sfc = 0.15;
+
+% variables
+
+dz_init = [0.05,0.05,0.05,0.05,0.05];
+rho_snw_init = [200, 200, 200, 200, 300];
+rds_snw_init = [350, 350, 350, 350, 350];
+rds_coated_init = ["0","0","0","0","0"];
+x_init = 0.01e6;
+y_init = 500000;
+initial_T = [273, 272.75, 272.5, 272, 270];
+fliqs_init = [0,0,0,0,0];
+f_refs_init = [0,0,0,0,0];
+rho_snw = rho_snw_init;
+scavenging_rate = 2;
+
 x_list(1,1) = 0;
-y_list(1,1) = y_init;
 T_list(1,[1:length(initial_T)]) = initial_T;
 f_refs_list(1,[1:length(f_refs_init)]) = f_refs_init;
 fliqs_list(1,[1:length(fliqs_init)]) = fliqs_init;
 rds_list(1,[1:length(rds_snw_init)]) = rds_snw_init;
 dz_list(1,[1:length(dz_init)]) = dz_init;
-
+y_list(1,1) = y_init;
 
 if GRAIN_SIZE==1
     %%%%%%% BEGIN RUN 1 %%%%%%%%%%%%%
-    [overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, y_init,  initial_T, fliqs_init, f_refs_init);
+    [overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, y_init, initial_T, fliqs_init, f_refs_init);
 
     % add new variable values to lists. Each run is a separate row, each snow layer
     % is a separate column
@@ -46,7 +70,7 @@ if GRAIN_SIZE==1
 
     % update outputs for next run
     x_init = x_init*2;
-    y_init = y_init*scavenging_rate;
+    y_init = y*scavenging_rate;
     Initial_T = new_T;
     f_refs_init = f_refs;
     fliqs_init = fliqs;
@@ -65,12 +89,13 @@ if GRAIN_SIZE==1
     rds_list(3,[1:length(rds_snw_init)]) = round(overall_new_r);
     dz_list(3,[1:length(dz_init)]) = dz_init;
 
+    x_init = x_init*2;
+    y_init = y_init*scavenging_rate;
     Initial_T = new_T;
     f_refs_init = f_refs;
     fliqs_init = fliqs;
     rds_snw_init = round(overall_new_r);
     x_init = x_init*2;
-    y_init = y_init*scavenging_rate;
     dz_init = dz_new;
 
     %%%%%%%% BEGIN RUN 3 %%%%%%%%%%
@@ -134,7 +159,7 @@ if GRAIN_SIZE==1
 
     [overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, y_init, initial_T, fliqs_init, f_refs_init);
     x_list(7,1) = x_init;
-    y_list(7,1) = y_init;
+    y_list(8,1) = y_init;
     T_list(7,[1:length(new_T)]) = new_T;
     f_refs_list(7,[1:length(f_refs_init)]) = f_refs;
     fliqs_list(7,[1:length(fliqs_init)]) = fliqs;
@@ -170,7 +195,7 @@ if GRAIN_SIZE==1
 
     %%%%%%%% BEGIN RUN 8 %%%%%%%%%%
 
-    [overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, y_init,  initial_T, fliqs_init, f_refs_init);
+    [overall_new_r, f_refs, new_T, fliqs, dz_new] = snicar_melting_setup(BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init, x_init, y_init, initial_T, fliqs_init, f_refs_init);
     x_list(9,1) = x_init;
     y_list(9,1) = y_init;
     T_list(9,[1:length(new_T)]) = new_T;
@@ -231,8 +256,8 @@ if GRAIN_SIZE==1
     % Create labelled table for each output variable
 
     T_table = array2table(T_list,'VariableNames',{'T_top','T_z2','T_z3','T_z4','T_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
-    x_table = array2table(x_list,'VariableNames',{'Alg'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
-    y_table = array2table(y_list,'VariableNames',{'Dust'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
+    x_table = array2table(x_list,'VariableNames',{'x'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
+    y_table = array2table(y_list,'VariableNames',{'Dust Conc'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
     f_ref_table = array2table(f_refs_list,'VariableNames',{'f_ref_top','f_ref_z2','f_ref_z3','f_ref_z4','f_ref_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
     fliqs_table = array2table(fliqs_list,'VariableNames',{'fliqs_top','fliqs_z2','fliqs_z3','fliqs_z4','fliqs_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
     rds_table = array2table(rds_list,'VariableNames',{'r_top','r_z2','r_z3','r_z4','r_btm'},'RowNames',{'SNICAR_INIT','SNICAR_1','SNICAR_2','SNICAR_3','SNICAR_4','SNICAR_5','SNICAR_6','SNICAR_7','SNICAR_8','SNICAR_9','SNICAR_10'});
@@ -264,10 +289,12 @@ if GRAIN_SIZE==1
 
         % set path
 
+        folder_path = '/media/joe/9446-2970/FromGardner/snicar_package/';
+
         a = sprintf('%04s',num2str(rad));
 
         % if water coating required, add 'coated' into filename 
-        
+
         filename = strcat('ice_wrn_',a,'.nc');
         fullpath = strcat(folder_path,filename);
 
@@ -299,15 +326,15 @@ if GRAIN_SIZE==1
     % inputting of values into SNICAR is required using this method = major
     % time saving and avoids human errors.
 
+    spectral_list = zeros(470,length(x_list));
 
     for i = 1:1:length(x_list)
         dz = dz_list(i,:);
         rho_snw(i,:) = rho_snw_init;
         rds_snw(i,:) = rds_list(i,:);
-        x = x_list(i);
-        y = y_list(i);
+        x = x_list(i,:);
 
-        [BBalb,spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x,y);
+        [BBalb,spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x);
 
         BBA(i) = BBalb;
         spectral_list(:,i) = spectral;
@@ -340,17 +367,18 @@ else
     for i = 1:1:11
         
         x = x_list(1,i);
-        y = y_list(1,i);
         dz = dz_init;
         rho_snw = rho_snw_init;
         rds_snw = rds_snw_init;
         
-        [BBalb,spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x,y);
+        [BBalb,spectral] = SNICAR_function_CASPA(BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc,dz,rho_snw,rds_snw,x);
 
         BBA(i) = BBalb;
         spectral_list(:,i) = spectral;
     
     end
+
+x_list = x_list(1:11);
 
 end
 

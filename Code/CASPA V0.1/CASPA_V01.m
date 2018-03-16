@@ -190,6 +190,8 @@ for counter = 1:timestep:time_tot
         end
     end
 
+    
+    
 % %% Plotting for initial 'surface class' grid disabled. Uncomment to show plot.
 
 %     meanlist(counter) = mean2(grid);

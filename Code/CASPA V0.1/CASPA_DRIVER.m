@@ -2,16 +2,9 @@
 
 % This code is the master driver script for CASPA including definition of
 % initial conditions, setup and model running. This is now the only script
-% the user needs to intercat with in order to set up and run CASPA except
+% the user needs to interact with in order to set up and run CASPA except
 % significant modifications are to be made.
 
-
-% TODO
-
-% 1) incorporate dust as a variable - initially as a user defined constant
-% then perhaps enable scavenging by increasing concentration
-% per time step as per algal blooms? Simulate microbial dust retention by
-% relating biomass with in situ dust accumulation?
 
 clear
 
@@ -45,7 +38,9 @@ chance_insitu = 60; % probability (%) that growth occurs in situ (100 - chance_i
 
 % Initial conditions
 
-x_init = 5000;
+x_init = 5000; % algal concentration at t=0
+y_init = 50000; % dust concentration at t=0
+scavenging_rate = 3; % how much scavenging of dust occurs per timestep (2 = double dust per timestep)
 dz_init = [0.05,0.05,0.05,0.05,0.05];
 rho_snw_init = [150, 150, 150, 150, 150];
 rds_snw_init = [100, 200, 200, 200, 200];
@@ -57,7 +52,7 @@ rho_snw = rho_snw_init;
 
 % run setup code with conditions defined above
 
-CASPA_setup(GRAIN_SIZE, BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init,x_init, initial_T, fliqs_init, f_refs_init,folder_path);
+CASPA_setup(GRAIN_SIZE, BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init,x_init, y_init, scavenging_rate, initial_T, fliqs_init, f_refs_init,folder_path);
 
 
 %%%%%%%%%%%%%%%%%% SECTION 2: CASPA RUN  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
