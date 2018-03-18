@@ -69,7 +69,11 @@ The CASPA repository should be cloned or downloaded and all files
 saved to the working directory. 
 
 The user-defined variables are assigned in the driver. The grain size evolution
-code cna be turned on or off and the properties of the snowpack defined.
+code can be turned on or off and the properties of the snowpack defined.
+
+The scavenging rate for mineral dusts is user defined. To have a dust free
+model run, set the initial mixing ratio (y) to zero. To have a constant dust
+mixing ratio throughout the run, set the scavenging rate to 1.
 
 Running the driver first calls the setup functions. This will populate the 
 workspace with all relevant datasets. 
