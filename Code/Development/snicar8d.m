@@ -90,9 +90,9 @@ function data_out = snicar8d(BND_TYP_IN, DIRECT_IN, APRX_TYP_IN, ...
                              mss_cnc_sot1_in, mss_cnc_sot2_in, ...
                              mss_cnc_dst1_in, mss_cnc_dst2_in, ...
                              mss_cnc_dst3_in, mss_cnc_dst4_in, ...
-                             mss_cnc_ash1_in,mss_cnc_bio1_in, mss_cnc_bio2_in,mss_cnc_bio3_in,mss_cnc_bio4_in,mss_cnc_bio5_in, mss_cnc_bio6_in, mss_cnc_bio7_in, mss_cnc_hematite_in, mss_cnc_mixed_sand_in, fl_sot1_in, fl_sot2_in, ...
+                             mss_cnc_ash1_in,mss_cnc_bio1_in, mss_cnc_bio2_in,mss_cnc_bio3_in,mss_cnc_bio4_in,mss_cnc_bio5_in, mss_cnc_bio6_in, mss_cnc_bio7_in, mss_cnc_RBio1_in, mss_cnc_hematite_in, mss_cnc_mixed_sand_in, fl_sot1_in, fl_sot2_in, ...
                              fl_dst1_in, fl_dst2_in, fl_dst3_in, ...
-                             fl_dst4_in, fl_ash1_in,fl_bio1_in,fl_bio2_in,fl_bio3_in,fl_bio4_in, fl_bio5_in,fl_bio6_in, fl_bio7_in, fl_hematite_in, fl_mixed_sand_in);
+                             fl_dst4_in, fl_ash1_in,fl_bio1_in,fl_bio2_in,fl_bio3_in,fl_bio4_in, fl_bio5_in,fl_bio6_in, fl_bio7_in, fl_RBio1_in, fl_hematite_in, fl_mixed_sand_in);
 
     
 if (1==0)
@@ -125,7 +125,7 @@ if (1==0)
     
     % NUMBER OF PARTICLE SPECIES IN SNOW (ICE EXCLUDED)
     
-    nbr_aer = 16; % JC EDIT
+    nbr_aer = 17; % JC EDIT
   
     
     % PARTICLE MASS MIXING RATIOS (units: ng g-1)
@@ -143,6 +143,7 @@ if (1==0)
     mss_cnc_bio5(1:nbr_lyr)  = 0.0;    % biological impurity 5 % JC EDIT
     mss_cnc_bio6(1:nbr_lyr)  = 0.0;    % biological impurity 6 % JC EDIT
     mss_cnc_bio7(1:nbr_lyr)  = 0.0;    % biological impurity 7 % JC EDIT
+    mss_cnc_RBio1(1:nbr_lyr) = 0.0; % Algae measured pigments % JC EDIT
     mss_cnc_hematite(1:nbr_lyr)= 0.0;    % hematite type 1 % JC EDIT
     mss_cnc_mixed_sand(1:nbr_lyr) = 0.0; % mixed sand % JC EDIT
     
@@ -162,6 +163,7 @@ if (1==0)
     fl_bio5  = 'biological_5.nc'; % Biological impurity 5 (10um diameter, pigs as per bio2) % JC EDIT
     fl_bio6  = 'biological_6.nc'; % Biological impurity 6 (50um diameter, pigs as per bio2) % JC EDIT
     fl_bio7  = 'biological_7.nc'; % Biological impurity 6 (20um diameter, pigs as per bio2) % JC EDIT
+    fl_RBio1 = 'Real_Bio1.nc' % Biological impurity with measured pigments, 20 micron diam % JC EDIT
     fl_hematite = 'Hematite.nc'; % hematite type 1 % JC EDIT
     fl_mixed_sand = 'mixed_sand.nc'; % mixed sand % JC EDIT
     
@@ -219,6 +221,7 @@ else
     mss_cnc_bio5  = mss_cnc_bio5_in;   % JC EDIT
     mss_cnc_bio6  = mss_cnc_bio6_in;   % JC EDIT
     mss_cnc_bio7  = mss_cnc_bio7_in;   % JC EDIT
+    mss_cnc_RBio1 = mss_cnc_RBio1_in; % JC EDIT
     mss_cnc_hematite = mss_cnc_hematite_in;   % JC EDIT
     mss_cnc_mixed_sand = mss_cnc_mixed_sand_in; % JC EDIT
     
@@ -236,7 +239,8 @@ else
     fl_bio5       = fl_bio5_in;   % JC EDIT
     fl_bio6       = fl_bio6_in;   % JC EDIT
     fl_bio7       = fl_bio7_in;   % JC EDIT
-    fl_hematite     = fl_hematite_in;   % JC EDIT
+    fl_RBio1      = fl_RBio1_in; % JC EDIT
+    fl_hematite   = fl_hematite_in;   % JC EDIT
     fl_mixed_sand = fl_mixed_sand_in; % JC EDIT
 
     
@@ -448,8 +452,9 @@ fl_in11 = strcat(wrkdir,fl_bio4); % JC EDIT
 fl_in12 = strcat(wrkdir,fl_bio5); % JC EDIT
 fl_in13 = strcat(wrkdir,fl_bio6); % JC EDIT
 fl_in14 = strcat(wrkdir,fl_bio7); % JC EDIT
-fl_in15 = strcat(wrkdir,fl_hematite); % JC EDIT
-fl_in16 = strcat(wrkdir,fl_mixed_sand); % JEC EDIT
+fl_in15 = strcat(wrkdir,fl_RBio1); % JC EDIT
+fl_in16 = strcat(wrkdir,fl_hematite); % JC EDIT
+fl_in17 = strcat(wrkdir,fl_mixed_sand); % JEC EDIT
 
 
 omega_aer(:,1)       = ncread(fl_in1,'ss_alb');
@@ -517,6 +522,10 @@ omega_aer(:,16)       = ncread(fl_in16,'ss_alb');   % JC EDIT
 g_aer(:,16)           = ncread(fl_in16,'asm_prm');   % JC EDIT
 ext_cff_mss_aer(:,16) = ncread(fl_in16,'ext_cff_mss');   % JC EDIT
 
+omega_aer(:,17)       = ncread(fl_in17,'ss_alb');   % JC EDIT
+g_aer(:,17)           = ncread(fl_in17,'asm_prm');   % JC EDIT
+ext_cff_mss_aer(:,17) = ncread(fl_in17,'ext_cff_mss');   % JC EDIT
+
 % Set aerosol concentration matrix:
 mss_cnc_aer(1:nbr_lyr,1) = mss_cnc_sot1;
 mss_cnc_aer(1:nbr_lyr,2) = mss_cnc_sot2;
@@ -532,13 +541,13 @@ mss_cnc_aer(1:nbr_lyr,11) = mss_cnc_bio4; % JC EDIT
 mss_cnc_aer(1:nbr_lyr,12) = mss_cnc_bio5; % JC EDIT
 mss_cnc_aer(1:nbr_lyr,13) = mss_cnc_bio6; % JC EDIT
 mss_cnc_aer(1:nbr_lyr,14) = mss_cnc_bio7; % JC EDIT
-mss_cnc_aer(1:nbr_lyr,15) = mss_cnc_hematite; %JC EDIT
-mss_cnc_aer(1:nbr_lyr,16) = mss_cnc_mixed_sand; % JC EDIT
+mss_cnc_aer(1:nbr_lyr,15) = mss_cnc_RBio1; %JC EDIT
+mss_cnc_aer(1:nbr_lyr,16) = mss_cnc_hematite; % JC EDIT
+mss_cnc_aer(1:nbr_lyr,17) = mss_cnc_mixed_sand; % JC EDIT
+
 
 % convert to units of kg/kg:
 mss_cnc_aer = mss_cnc_aer.*10^-9;
-
-
 
 % BEGIN RT SOLVER:
 
@@ -995,12 +1004,8 @@ data_out(19,4) = F_abs_vis_btm; % VIS absorption by underlying surface
 data_out(20,4) = F_abs_nir_btm; % NIR absorption by underlying surface
 data_out(21,4) = sum((mu_not*pi*Fs))+sum(Fd);  % total downwelling energy on upper boundary
 data_out([1:5],6) = heat_rt; % JC EDIT output radiative heating rate in each layer in K/hr 
+data_out([1:470],[7:11]) = intensity2; %JC EDIT output planar intensity per layer
 
-% F_abs_top = data_out(6,4);
-% F_abs_scnd = data_out(9,4);
-% F_abs_thrd = data_out(12,4);
-% F_abs_frth = data_out(15,4);
-% F_abs_btm = data_out(18,4);
 
 
 
