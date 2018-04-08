@@ -34,18 +34,18 @@ length_scale = 0.1; % define length of each pixel in metres
 alg_frac = 0.5; % percentage of algal coverage at start of experiment (all initialise as light algae: class 1)
 non_alg_frac = gridsize-alg_frac; % residual = non-algal, assumed clean
 doubling_time = 3; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
-chance_insitu = 60; % probability (%) that growth occurs in situ (100 - chance_insitu = chance spreading)
+chance_insitu = 55; % probability (%) that growth occurs in situ (100 - chance_insitu = chance spreading)
 
 % Initial conditions
 
 x_init = 5000; % algal concentration at t=0
-y_init = 50000; % dust concentration at t=0
-scavenging_rate = 3; % how much scavenging of dust occurs per timestep (2 = double dust per timestep)
+y_init = 500000; % dust concentration at t=0
+scavenging_rate = 1.1; % how much scavenging of dust occurs per timestep (2 = double dust per timestep)
 dz_init = [0.05,0.05,0.05,0.05,0.05];
 rho_snw_init = [150, 150, 150, 150, 150];
 rds_snw_init = [100, 200, 200, 200, 200];
 rds_coated_init = ["0","0","0","0","0"];
-initial_T = [273, 272.75, 272.25, 272, 270];
+initial_T = [273.15, 273, 272, 270, 268];
 fliqs_init = [0,0,0,0,0];
 f_refs_init = [0,0,0,0,0];
 rho_snw = rho_snw_init;
@@ -57,11 +57,11 @@ CASPA_setup(GRAIN_SIZE, BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init
 
 %%%%%%%%%%%%%%%%%% SECTION 2: CASPA RUN  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-num_runs = 1;
+num_runs = 5;
 
 for i = 1:1:num_runs
     
-    [spectral_average, BBAlist, x_time, Tot_biomass_per_m] = CASPA_V01(time_tot,timestep, gridsize, length_scale, alg_frac, doubling_time,chance_insitu, folder_path,rho_snw);
+    [spectral_average, BBAlist, x_time, Tot_biomass_per_m, Tot_alg_pixels_percent_list] = CASPA_V01(time_tot,timestep, gridsize, length_scale, alg_frac, doubling_time,chance_insitu, folder_path,rho_snw);
     
     BBA(:,i) = BBAlist;
     Biomass(:,i) = Tot_biomass_per_m;
@@ -78,6 +78,18 @@ for i = 1:1:num_runs
     plot(x_time,Tot_biomass_per_m,'--c','LineWidth',0.1)
     ylabel('Biomass g/m^2')
 
+    figure(3)
+    yyaxis right
+    
+    plot(x_time,Tot_alg_pixels_percent_list,'--m','color','r','LineWidth',0.2)
+    xlabel('Time (days)')
+    ylabel('% coverage')
+    
+    yyaxis left
+    plot(x_time,BBAlist, '--c','LineWidth',0.2)
+    ylabel('albedo')
+    hold on
+    
 end
 
 % plot
@@ -93,5 +105,7 @@ if num_runs > 1
     
     yyaxis left
     plot(x_time, Biomass_av,'color','b','LineWidth',2)
+    
+   
     
 end

@@ -242,8 +242,8 @@ if GRAIN_SIZE==1
 
     output_table = [x_table,y_table,T_table,dz_table,rds_table]
 
-    snicar_params = [BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc];
-    snicar_params_table = array2table(snicar_params,'VariableNames',{'BND_TYP','DIRECT','APRX_TYP','DELTA','coszen','R_sfc'})
+    snicar_params = [BND_TYP,DIRECT,APRX_TYP,DELTA,coszen,R_sfc, scavenging_rate];
+    snicar_params_table = array2table(snicar_params,'VariableNames',{'BND_TYP','DIRECT','APRX_TYP','DELTA','coszen','R_sfc','scavenging_rate'})
 
 
     % Write tables to csv

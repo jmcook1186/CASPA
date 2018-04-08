@@ -68,15 +68,13 @@
         
     % 1. Can the initial grid be set using UAV or satellite imagery?
     
-    % 2. How should I deal with dust? constant background? 
-    
-    % 3. Need to reduce IRF etc due to day/night irradiance changes?
+    % 2. Need to reduce IRF etc due to day/night irradiance changes?
     % Currently assumes constant irradiance throughout timestep (no night
     % time)
     
 % open figures for plotting the final albedo grid
 
-function [spectral_average, BBAlist,x_time,Tot_biomass_per_m] = CASPA_V01(time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, chance_insitu, folder_path, rho_snw)
+function [spectral_average, BBAlist,x_time,Tot_biomass_per_m,Tot_alg_pixels_percent_list] = CASPA_V01(time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, chance_insitu, folder_path, rho_snw)
 
 % set up empty lists
 
@@ -325,6 +323,7 @@ biomass = [];
     cbar.Label.String = 'Albedo';
     caxis([0,0.7]);
     drawnow
+
     
     % saveas(figure(1),sprintf('FIG_%d.jpg',counter));
     
