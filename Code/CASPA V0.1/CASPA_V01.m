@@ -74,7 +74,7 @@
     
 % open figures for plotting the final albedo grid
 
-function [spectral_average, BBAlist,x_time,Tot_biomass_per_m,Tot_alg_pixels_percent_list] = CASPA_V01(time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, chance_insitu, folder_path, rho_snw)
+function [spectral_average, BBAlist,x_time,Tot_biomass_per_m,Tot_alg_pixels_percent_list] = CASPA_V01(growth_grid,time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, folder_path, rho_snw)
 
 % set up empty lists
 
@@ -124,10 +124,10 @@ for counter = 1:timestep:time_tot
                 grid(i,j) = grid(i,j);
                        
             elseif grid(i,j) > 0 && grid(i,j) < 10 % if cell is between 1 and 9, chance of increasing in situ = 'chance_insitu'
-                if rand < chance_insitu
+                if rand < growth_grid(i,j)
                     grid(i,j) = grid(i,j)+1;
                     
-                elseif rand > 100-chance_insitu || grid(i,j) == 10 % if rand > 100-chance_insitu OR cell value = 10, bloom spreads, not darkening in situ
+                elseif rand > growth_grid(i,j) || grid(i,j) == 10 % if rand > 100-chance_insitu OR cell value = 10, bloom spreads, not darkening in situ
                     rand1 = randi(8,1); % each neighbour has equal chance of being colonised
             
                     if i < gridx && j < gridy && i >1 && j >1
