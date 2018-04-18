@@ -74,7 +74,7 @@
     
 % open figures for plotting the final albedo grid
 
-function [spectral_average, BBAlist,x_time,Tot_biomass_per_m,Tot_alg_pixels_percent_list] = CASPA_V01(growth_grid,time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, folder_path, rho_snw)
+function [spectral_average, BBAlist,x_time,Tot_biomass_per_m,Tot_alg_pixels_percent_list] = CASPA_V01(CONSTANT_PROBS,growth_grid,time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, folder_path, rho_snw)
 
 % set up empty lists
 
@@ -112,8 +112,13 @@ non_alg_pixels = gridsize-alg_pixels;
 grid = reshape([zeros(non_alg_pixels,1) ; ones(alg_pixels,1)],gridx,gridy) ;
 grid(:) = grid(randperm(numel(grid))) ;
 
+
 % start stepping through time
 for counter = 1:timestep:time_tot    
+    
+    if CONSTANT_PROBS ==0
+        growth_grid = randi(100,gridx,gridy); % create random grid of probabilities for growth in situ or growth by spreading
+    end
     
     rand = randi(100,1); % return one pseudorandom integer between 1-100 (each integer has 1% chance of selection)
     

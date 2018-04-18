@@ -17,6 +17,7 @@ folder_path = "/media/joe/9446-2970/FromGardner/snicar_package/";
 % Snicar params
 
 GRAIN_SIZE = 1;   % switch grain evolution model on/off (1/0)
+CONSTANT_PROBS = 0; % new random growth_grid in each run, on = new, in each run, off = set in driver then constant for all runs
 BND_TYP = 1;      % 1 = spectral
 DIRECT = 1;       % Direct illumination = 1, diffuse =  0
 APRX_TYP = 1;     % Eddington (1), quadrature (2) or hemispheric mean(3)
@@ -33,8 +34,8 @@ gridsize = 40000; % total grid area (no. cells)
 length_scale = 0.1; % define length of each pixel in metres
 alg_frac = 0.5; % percentage of algal coverage at start of experiment (all initialise as light algae: class 1)
 non_alg_frac = gridsize-alg_frac; % residual = non-algal, assumed clean
-doubling_time = 3; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
-growth_grid = randi(100,sqrt(gridsize),sqrt(gridsize));
+doubling_time = 5; % algal doubling time in days (3 is fast, 7 is slow - from literature e.g. Yallop, Stibal) 
+growth_grid = randi(100,sqrt(gridsize),sqrt(gridsize)); % create random grid of probabilities for growth in situ or growth by spreading
 
 % Initial conditions
 
@@ -57,11 +58,11 @@ CASPA_setup(GRAIN_SIZE, BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init
 
 %%%%%%%%%%%%%%%%%% SECTION 2: CASPA RUN  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-num_runs = 1;
+num_runs = 5;
 
 for i = 1:1:num_runs
     
-    [spectral_average, BBAlist, x_time, Tot_biomass_per_m, Tot_alg_pixels_percent_list] = CASPA_V01(growth_grid,time_tot,timestep, gridsize, length_scale, alg_frac, doubling_time,folder_path,rho_snw);
+    [spectral_average, BBAlist, x_time, Tot_biomass_per_m, Tot_alg_pixels_percent_list] = CASPA_V01(CONSTANT_PROBS,growth_grid,time_tot,timestep, gridsize, length_scale, alg_frac, doubling_time,folder_path,rho_snw);
     
     BBA(:,i) = BBAlist;
     Biomass(:,i) = Tot_biomass_per_m;
