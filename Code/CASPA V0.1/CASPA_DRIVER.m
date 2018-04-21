@@ -12,12 +12,13 @@ clear
 
 % Here user defined variable values are set and the setup code run.
 
-folder_path = "/media/joe/9446-2970/FromGardner/snicar_package/";
-
+%folder_path = "/media/joe/9446-2970/FromGardner/snicar_package/";
+folder_path = '/media/joe/9446-2970/FromGardner/snicar_package/';
 % Snicar params
 
 GRAIN_SIZE = 1;   % switch grain evolution model on/off (1/0)
 CONSTANT_PROBS = 0; % new random growth_grid in each run, on = new, in each run, off = set in driver then constant for all runs
+MASK = 1;         % use a mask to modify areas of the grid, 1 = on, 0 = off
 BND_TYP = 1;      % 1 = spectral
 DIRECT = 1;       % Direct illumination = 1, diffuse =  0
 APRX_TYP = 1;     % Eddington (1), quadrature (2) or hemispheric mean(3)
@@ -58,11 +59,12 @@ CASPA_setup(GRAIN_SIZE, BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init
 
 %%%%%%%%%%%%%%%%%% SECTION 2: CASPA RUN  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-num_runs = 5;
+num_runs = 1;
 
 for i = 1:1:num_runs
     
-    [spectral_average, BBAlist, x_time, Tot_biomass_per_m, Tot_alg_pixels_percent_list] = CASPA_V01(CONSTANT_PROBS,growth_grid,time_tot,timestep, gridsize, length_scale, alg_frac, doubling_time,folder_path,rho_snw);
+    [spectral_average, BBAlist, x_time, Tot_biomass_per_m, Tot_alg_pixels_percent_list] = CASPA_V01(MASK,CONSTANT_PROBS,growth_grid,time_tot,timestep, gridsize, length_scale, alg_frac, doubling_time,folder_path,rho_snw);
+
     
     BBA(:,i) = BBAlist;
     Biomass(:,i) = Tot_biomass_per_m;
@@ -106,7 +108,6 @@ if num_runs > 1
     
     yyaxis left
     plot(x_time, Biomass_av,'color','b','LineWidth',2)
-    
-   
+      
     
 end

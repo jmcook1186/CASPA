@@ -74,7 +74,7 @@
     
 % open figures for plotting the final albedo grid
 
-function [spectral_average, BBAlist,x_time,Tot_biomass_per_m,Tot_alg_pixels_percent_list] = CASPA_V01(CONSTANT_PROBS,growth_grid,time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, folder_path, rho_snw)
+function [spectral_average, BBAlist,x_time,Tot_biomass_per_m,Tot_alg_pixels_percent_list] = CASPA_V01(MASK,CONSTANT_PROBS,growth_grid,time_tot, timestep, gridsize, length_scale, alg_frac, doubling_time, folder_path, rho_snw)
 
 % set up empty lists
 
@@ -90,11 +90,14 @@ Tot_alg_pixels_percent_list = [];
 
 %read incoming irradiance file and assign to variable 'incoming'
 % fileID = fopen('media/joe/9446-2970/FromGardner/snicar_package/mlw_sfc_flx_frc_clr.txt');
-fileID = fopen(folder_path + 'mlw_sfc_flx_frc_clr.txt');
+fileID = fopen(strcat(folder_path, 'mlw_sfc_flx_frc_clr.txt'));
 incoming=textscan(fileID,'%f','Delimiter',',');
 incoming=cell2mat(incoming); %convert to column vector
 fclose(fileID);
 
+mask_spectral_albedo(1:470) = 0.01;
+mask_spectral_albedo= mask_spectral_albedo';
+mask_BBA = 0.01;
 
 % %% Set up grid
 
@@ -112,6 +115,24 @@ non_alg_pixels = gridsize-alg_pixels;
 grid = reshape([zeros(non_alg_pixels,1) ; ones(alg_pixels,1)],gridx,gridy) ;
 grid(:) = grid(randperm(numel(grid))) ;
 
+% if mask function is turned on, create the masking grid here
+% NOTE that this is where the coordinates for the mask are defined, in
+% future this would be better done in the driver script
+% Also in future it would be better to import an image rather than set
+% coordinates to enable complex shapes
+
+if MASK ==1
+    mask = zeros(sqrt(gridsize),sqrt(gridsize));
+    block_area1X = (1:5);
+    block_area1Y = (1:5);
+    block_area2X = (20:30);
+    block_area2Y = (20:30);
+    block_area3X = (60:70);
+    block_area3Y = (60:70);
+    mask(block_area1X,block_area1Y) = ones;
+    mask(block_area2X,block_area2Y) = ones;
+    mask(block_area3X,block_area3Y) = ones;
+end
 
 % start stepping through time
 for counter = 1:timestep:time_tot    
@@ -123,8 +144,14 @@ for counter = 1:timestep:time_tot
     rand = randi(100,1); % return one pseudorandom integer between 1-100 (each integer has 1% chance of selection)
     
     for i = 2:1:gridx-1  %%%% NEED TO DEAL WITH EDGES BETTER!!!!
-        for j = 2:1:gridy-1 %%%% NEED TO DEAL WITH EDGES BETTER!!!!            
-      
+        for j = 2:1:gridy-1 %%%% NEED TO DEAL WITH EDGES BETTER!!!!
+            
+            if MASK ==1
+                if mask(i,j) == 1
+                    grid(i,j) = 100; % if the cell corresponds to a masked cell, take the mask albedo
+                end
+            end
+            
             if grid(i,j) == 0   % if cell = 0, stay clean: i.e. bloom can't spontaneously form in areas of clean snow
                 grid(i,j) = grid(i,j);
                        
@@ -254,8 +281,10 @@ biomass = [];
                 grid2(i,j) = BBA.BBA(10);
             elseif grid(i,j) ==10
                 grid2(i,j) = BBA.BBA(11);
-            elseif grid(i,j) >10
-                grid2(i,j) = BBA.BBA(11);                   
+            elseif grid(i,j) >10<100
+                grid2(i,j) = BBA.BBA(11);
+            elseif grid(i,j) ==100;
+                grid2(i,j) = mask_BBA;
             end
         end
     end
@@ -276,9 +305,10 @@ biomass = [];
     I = sum(grid(:)==8) * SPEC.spectral_list(:,9);
     J = sum(grid(:)==9) * SPEC.spectral_list(:,10);
     K = sum(grid(:)==10) * SPEC.spectral_list(:,11);
-    L = sum(grid(:)>10) * SPEC.spectral_list(:,11);
+    L = sum(grid(:)>10<100) * SPEC.spectral_list(:,11);
+    M = sum(grid(:)==100) * mask_spectral_albedo;
     
-    sumspec = A+B+C+D+E+F+G+H+I+J+K+L;
+    sumspec = A+B+C+D+E+F+G+H+I+J+K+L+M;
     
 % Weighted average spectral albedo    
     
