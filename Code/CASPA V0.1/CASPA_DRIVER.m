@@ -14,11 +14,12 @@ clear
 
 %folder_path = "/media/joe/9446-2970/FromGardner/snicar_package/";
 folder_path = '/media/joe/9446-2970/FromGardner/snicar_package/';
+image_name = 'snow_test2.jpg';
 % Snicar params
 
 GRAIN_SIZE = 1;   % switch grain evolution model on/off (1/0)
 CONSTANT_PROBS = 0; % new random growth_grid in each run, on = new, in each run, off = set in driver then constant for all runs
-MASK = 1;         % use a mask to modify areas of the grid, 1 = on, 0 = off
+MASK = 0;         % use a mask to modify areas of the grid, 1 = on, 0 = off
 BND_TYP = 1;      % 1 = spectral
 DIRECT = 1;       % Direct illumination = 1, diffuse =  0
 APRX_TYP = 1;     % Eddington (1), quadrature (2) or hemispheric mean(3)
@@ -41,7 +42,7 @@ growth_grid = randi(100,sqrt(gridsize),sqrt(gridsize)); % create random grid of 
 % Initial conditions
 
 x_init = 5000; % algal concentration at t=0
-y_init = 500000; % dust concentration at t=0
+y_init = 0; % dust concentration at t=0
 scavenging_rate = 1.1; % how much scavenging of dust occurs per timestep (2 = double dust per timestep)
 dz_init = [0.05,0.05,0.05,0.05,0.05];
 rho_snw_init = [150, 150, 150, 150, 150];
@@ -56,7 +57,9 @@ rho_snw = rho_snw_init;
 
 CASPA_setup(GRAIN_SIZE, BND_TYP, DIRECT, APRX_TYP, DELTA, coszen, R_sfc, dz_init, rho_snw_init, rds_snw_init, rds_coated_init,x_init, y_init, scavenging_rate, initial_T, fliqs_init, f_refs_init,folder_path);
 
-
+if MASK ==1
+    CASPA_mask_generator(folder_path,image_name,gridsize);
+end
 %%%%%%%%%%%%%%%%%% SECTION 2: CASPA RUN  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 num_runs = 1;

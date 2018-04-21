@@ -115,23 +115,9 @@ non_alg_pixels = gridsize-alg_pixels;
 grid = reshape([zeros(non_alg_pixels,1) ; ones(alg_pixels,1)],gridx,gridy) ;
 grid(:) = grid(randperm(numel(grid))) ;
 
-% if mask function is turned on, create the masking grid here
-% NOTE that this is where the coordinates for the mask are defined, in
-% future this would be better done in the driver script
-% Also in future it would be better to import an image rather than set
-% coordinates to enable complex shapes
-
 if MASK ==1
-    mask = zeros(sqrt(gridsize),sqrt(gridsize));
-    block_area1X = (1:5);
-    block_area1Y = (1:5);
-    block_area2X = (20:30);
-    block_area2Y = (20:30);
-    block_area3X = (60:70);
-    block_area3Y = (60:70);
-    mask(block_area1X,block_area1Y) = ones;
-    mask(block_area2X,block_area2Y) = ones;
-    mask(block_area3X,block_area3Y) = ones;
+    maskfile = load('mask.mat');
+    mask = maskfile.mask;
 end
 
 % start stepping through time
@@ -147,7 +133,7 @@ for counter = 1:timestep:time_tot
         for j = 2:1:gridy-1 %%%% NEED TO DEAL WITH EDGES BETTER!!!!
             
             if MASK ==1
-                if mask(i,j) == 1
+                if mask(i,j) % mask is an array of logicals (true or false)
                     grid(i,j) = 100; % if the cell corresponds to a masked cell, take the mask albedo
                 end
             end
@@ -350,8 +336,8 @@ biomass = [];
     surf(grid2);
     view(2);
     colormap(map);
-    xlim([1,100]);
-    ylim([1,100]);
+    xlim([1,gridx-1]);
+    ylim([1,gridy-1]);
     shading interp;
     cbar = colorbar;
     cbar.Limits=[0,0.7];
